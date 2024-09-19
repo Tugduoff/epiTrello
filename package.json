@@ -7,18 +7,22 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "start": "nuxt start"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/i18n": "^8.5.3",
     "@pinia/nuxt": "^0.5.4",
-    "@prisma/client": "^5.19.1",
+    "@types/node": "^22.5.5",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
     "nuxt": "^3.13.0",
+    "pg": "^8.13.0",
     "pinia": "^2.2.2",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "uuid": "^10.0.0",
     "vee-validate": "^4.13.2",
     "vue": "latest",
@@ -29,8 +33,9 @@
     "@nuxt/types": "^2.18.1",
     "@nuxt/typescript-build": "^3.0.2",
     "@types/i18n": "^0.13.12",
+    "@types/sqlite3": "^3.1.11",
     "@types/vue": "^2.0.0",
     "@types/vue-router": "^2.0.0",
-    "prisma": "^5.19.1"
+    "typescript": "^5.6.2"
   }
 }
