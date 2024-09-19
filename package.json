@@ -10,9 +10,10 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/i18n": "^8.5.3",
+    "@pinia/nuxt": "^0.5.4",
     "@prisma/client": "^5.19.1",
-    "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
@@ -25,6 +26,11 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@nuxt/types": "^2.18.1",
+    "@nuxt/typescript-build": "^3.0.2",
+    "@types/i18n": "^0.13.12",
+    "@types/vue": "^2.0.0",
+    "@types/vue-router": "^2.0.0",
     "prisma": "^5.19.1"
   }
 }
