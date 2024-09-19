@@ -21,7 +21,6 @@
           pkg-config
 
           nodejs_22
-          postgresql
         ];
 
         shellHook = ''
