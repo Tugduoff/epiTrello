@@ -3,7 +3,8 @@ import { defineNuxtConfig } from 'nuxt/config';
 export default defineNuxtConfig({
   modules: [
     '@nuxtjs/i18n',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@nuxtjs/color-mode'
   ],
   compatibilityDate: '2024-09-19',
   i18n: {
@@ -15,5 +16,15 @@ export default defineNuxtConfig({
     lazy: true,
     langDir: 'assets/langs/',
     strategy: 'prefix'
-  }
+  },
+  css: ['~/assets/css/tailwind.css'],
+  // css: [
+  //   'bootstrap/dist/css/bootstrap.min.css'
+  // ],
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
 });
