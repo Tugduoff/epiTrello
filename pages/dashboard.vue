@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1>Dashboard</h1>
+    <NuxtLayout name="user-layout">
+      <h1>Dashboard</h1>
+    </NuxtLayout>
   </div>
 </template>
 
