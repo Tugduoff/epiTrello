@@ -1,11 +1,8 @@
 <template>
-  <BaseLayout>
-    <NuxtPage />
-  </BaseLayout>
+  <NuxtPage />
 </template>
 
 <script setup>
-import BaseLayout from '@/layouts/default.vue';
 </script>
 
 <style>

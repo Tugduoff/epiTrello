@@ -53,7 +53,9 @@
         <h2 class="text-slate-800 text-sm">Shortcuts</h2>
       </div>
       <hr class="mt-2 py-1" />
-      <div class="hover:bg-slate-100 cursor-pointer py-2 text-start px-6 mb-2">
+      <div
+        @click="router.push(logoutRoute)"
+        class="hover:bg-slate-100 cursor-pointer py-2 text-start px-6 mb-2">
         <h2 class="text-slate-800 text-sm">Log Out</h2>
       </div>
 
@@ -64,6 +66,11 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const localePath = useLocalePath()
+const logoutRoute = localePath({ name: 'logout' })
 
 const showAccountMenu = ref(false)
 const accountMenu = ref<HTMLElement | null>(null)
