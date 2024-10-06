@@ -16,20 +16,20 @@ export default defineEventHandler(async (event: H3Event) => {
   // Find user in the database
   const user = await db.get('SELECT * FROM users WHERE email = ?', email);
   if (!user) {
-    return { statusCode: 400, body: { error: 'Invalid credentials' } };
+    return { status: 400, body: { error: 'Invalid credentials' } };
   }
 
   // Verify the password (wrapped version with error handling)
   const { response: isValid, err: verifyErr } = await verifyPassword(password, user.password);
   if (verifyErr || !isValid) {
-    return { statusCode: 400, body: { error: 'Invalid credentials' } };
+    return { status: 400, body: { error: 'Invalid credentials' } };
   }
 
   // Generate a token (wrapped version with error handling)
   const { response: token, err: tokenErr } = await generateToken(user);
   if (tokenErr) {
-    return { statusCode: 500, body: { error: 'Failed to generate token' } };
+    return { status: 500, body: { error: 'Failed to generate token' } };
   }
 
-  return { statusCode: 200, body: { token } };
+  return { status: 200, body: { token } };
 });
