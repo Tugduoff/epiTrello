@@ -4,6 +4,18 @@ import sqlite3 from 'sqlite3';
 // @ts-ignore
 import { open } from 'sqlite';
 
+export async function getDatabase() {
+  const dbName = process.env.DB_NAME || 'database';
+  const dbPath = path.join(process.cwd(), `${dbName}.db`);
+
+  const db = await open({
+    filename: dbPath,
+    driver: sqlite3.Database,
+  });
+
+  return db;
+}
+
 async function executeSql(db: { exec: (sql: string) => Promise<void>; }, sql: string) {
   try {
     await db.exec(sql);
@@ -14,12 +26,7 @@ async function executeSql(db: { exec: (sql: string) => Promise<void>; }, sql: st
 
 export default defineEventHandler(async (_) => {
   try {
-    const dbName = process.env.DB_NAME || 'database';
-    const dbPath = path.join(process.cwd(), `${dbName}.db`);
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database
-    });
+    const db = await getDatabase();
 
     console.log('Connected to SQLite.');
 

@@ -1,12 +1,11 @@
 <template>
   <div>
-    <h1>Home</h1>
-    <SignupForm />
-    <LoginForm />
+    <h1>Dashboard</h1>
   </div>
 </template>
 
 <script lang="ts" setup>
+
 </script>
 
 <style>

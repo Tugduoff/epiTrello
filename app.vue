@@ -1,7 +1,6 @@
 <template>
   <BaseLayout>
-    <h1 class="text-2xl font-bold">Welcome to My App!</h1>
-    <p>This is a simple example of a layout using Radix and Tailwind.</p>
+    <NuxtPage />
   </BaseLayout>
 </template>
 
