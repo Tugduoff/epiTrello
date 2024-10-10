@@ -11,6 +11,7 @@
     "start": "nuxt start"
   },
   "dependencies": {
+    "@nuxtjs/auth-next": "^5.0.0-1667386184.dfbbb54",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/color-mode": "^3.5.1",
     "@nuxtjs/i18n": "^8.5.3",
@@ -39,6 +40,7 @@
     "@types/i18n": "^0.13.12",
     "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/node-fetch": "^2.6.11",
     "@types/sqlite3": "^3.1.11",
     "@types/tailwindcss": "^3.1.0",
     "@types/vue": "^2.0.0",
@@ -46,6 +48,7 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.12",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3",
+    "vue-tsc": "^2.1.6"
   }
 }
