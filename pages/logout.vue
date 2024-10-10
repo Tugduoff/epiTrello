@@ -1,7 +1,7 @@
 <template>
   <div>
-    <NuxtLayout name="user-layout">
-      <h1>Dashboard</h1>
+    <NuxtLayout name="auth-layout">
+      <LogoutForm />
     </NuxtLayout>
   </div>
 </template>
