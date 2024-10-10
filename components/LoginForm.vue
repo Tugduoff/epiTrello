@@ -42,6 +42,15 @@
       <p v-if="error" class="mt-2 text-red-600">{{ error }}</p>
     </form>
 
+    <div class="mt-2">
+      <button
+        @click="loginWithGoogle"
+        class="w-full py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-200 flex items-center justify-center gap-2"
+      >
+        <Icon icon="mdi:google" class="text-lg" /> Log In with Google
+      </button>
+    </div>
+
     <div class="mt-4 text-center">
       <NuxtLink :to="localePath('/signup')" class="text-blue-600 hover:underline text-sm">Don't have an account? Sign Up</NuxtLink>
     </div>
@@ -98,14 +107,25 @@ const submitForm = handleSubmit(async () => {
   }
 });
 
+const loginWithGoogle = async () => {
+  try {
+    const response = await axios.get('/api/auth/google/request');
+
+    window.location.href = response.data.authUrl;
+  } catch (err: any) {
+    error.value = 'Google log-in failed';
+    console.error(err);
+  }
+};
+
 onMounted(() => {
   const token = Cookies.get('token');
   if (token) {
-    console.log('User is already logged in');
+    console.info('User is already logged in');
     const dashboardRoute = localePath({ name: 'dashboard' });
     router.push(dashboardRoute);
   } else {
-    console.log('User is not logged in');
+    console.info('User is not logged in');
   }
 });
 </script>

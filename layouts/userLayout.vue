@@ -19,9 +19,9 @@ const localePath = useLocalePath()
 onMounted(() => {
   const token = Cookies.get('token')
   if (token) {
-    console.log('User is logged in')
+    console.info('User is logged in')
   } else {
-    console.log('User is not logged in')
+    console.info('User is not logged in')
     const signupRoute = localePath({ name: 'signup' })
     router.push(signupRoute)
   }
