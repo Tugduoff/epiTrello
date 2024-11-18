@@ -1,21 +1,32 @@
 <template>
-  <div>
+  <div class="bg-slate-100">
     <NuxtLayout name="user-layout">
-      <h1>Boards of workspace {{ workspaceId }} of user {{ userId }}</h1>
-      <div v-if="boards.length === 0">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Boards of workspace {{ workspaceId }} of user {{ userId }}</h1>
+
+      <div v-if="boards.length === 0" class="text-center text-gray-600 text-lg">
         <p>No boards found</p>
       </div>
-      <div class="mt-4 flex flex-col space-y-4">
-        <div v-for="board in boards" :key="board.id" class="bg-slate-400 w-64 p-2 rounded-md cursor-pointer"
-          @click.prevent="redirectToBoard(board.id)">
-          <p>{{ board.name }}</p>
-          <p>{{ board.created_at }}</p>
+
+      <div class="mt-4 flex flex-wrap -mx-2 justify-center items-center">
+        <div
+          v-for="board in boards"
+          :key="board.id"
+          class="p-4 w-full sm:w-1/2 md:w-1/3"
+          @click.prevent="redirectToBoard(board.id)"
+        >
+          <div class="p-10 bg-white shadow-md rounded-md cursor-pointer hover:shadow-lg transition duration-200">
+            <p class="text-lg font-semibold text-gray-800">{{ board.name }}</p>
+            <p class="text-sm text-gray-600">{{ board.created_at }}</p>
+          </div>
         </div>
       </div>
-      <div class="mt-4 bg-slate-400 w-64 p-2 rounded-md cursor-pointer"
-        @click.prevent="redirectToCreateBoard()">
+
+      <div 
+        class="mt-10 mx-auto bg-blue-500 w-full max-w-sm p-4 rounded-lg text-center cursor-pointer text-white font-semibold text-lg transition-transform transform hover:scale-105"
+        @click.prevent="redirectToCreateBoard()"
+      >
         <p>Create a new board!</p>
-        <p>Click on this box to begin creation</p>
+        <p class="text-sm font-normal mt-1">Click on this box to begin creation</p>
       </div>
     </NuxtLayout>
   </div>
