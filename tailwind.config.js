@@ -9,6 +9,8 @@ export default {
     "./plugins/**/*.{js,ts}",
     "./app.vue",
     "./error.vue",
+    "./components/*.{js,vue,ts}",
+    "./pages/*.{js,vue,ts}",
   ],
   theme: {
     colors: {

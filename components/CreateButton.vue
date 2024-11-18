@@ -11,7 +11,8 @@
       class="bg-white text-black rounded-lg shadow-lg w-[22rem] mt-[7px] border border-gray-100 absolute"
       v-if="showCreateMenu">
       <div class="flex flex-col text-start justify-between cursor-pointer hover:bg-slate-100 px-4">
-        <div class="flex flex-row justify-start items-center">
+        <div class="flex flex-row justify-start items-center"
+          @click="redirectToCreate()">
           <Icon icon="mdi:trello" alt="" class="w-8 h-8 text-slate-700 p-2 rounded-md" />
           <h1 class="text-gray-600 font-mono font-medium text-sm ml-2 mt-2 mb-2 text-start">Create board</h1>
         </div>
@@ -31,9 +32,20 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const showCreateMenu = ref(false)
 const createMenu = ref<HTMLElement | null>(null)
+
+const router = useRouter()
+const route = useRoute()
+
+const redirectToCreate = () => {
+  console.log('redirecting to create board')
+  if (!route.params.userId || !route.params.workspaceId)
+    throw new Error('userId and workspaceId are required to create a board')
+  router.push(`/user/${route.params.userId}/workspace/${route.params.workspaceId}/board/create`)
+}
 
 const openCreateMenu = () => {
   showCreateMenu.value = !showCreateMenu.value

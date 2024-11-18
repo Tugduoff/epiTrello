@@ -9,7 +9,8 @@ CREATE TABLE users (
 CREATE TABLE workspaces (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(100) NOT NULL,
-  owner_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  description TEXT,
+  owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT unique_workspace_name_owner UNIQUE (name, owner_id)
 );

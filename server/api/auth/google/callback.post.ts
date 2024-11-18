@@ -3,6 +3,7 @@ import { getDatabase } from '~/server/middleware/db';
 import { generateToken } from '~/server/utils/auth';
 import axios from 'axios';
 import { useRuntimeConfig } from '#imports';
+import { activeTokens } from '../signup.post';
 
 interface GoogleCallbackRequest {
   code: string;
@@ -67,7 +68,10 @@ export default defineEventHandler(async (event: H3Event) => {
       return { status: 500, body: { error: 'Failed to generate token' } };
     }
 
-    return { status: 201, body: { token } };
+    const definedToken: string = token as string;
+    activeTokens.push({ email: userInfo.email, token: definedToken });
+
+    return { status: 201, body: { token, email: userInfo.email } };
 
   } catch (error) {
     console.error('Error during Google OAuth process:', error);

@@ -8,24 +8,7 @@
   </div>
 </template>
 
-<script setup>
-import { onMounted } from 'vue'
-import Cookies from 'js-cookie'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-const localePath = useLocalePath()
-
-onMounted(() => {
-  const token = Cookies.get('token')
-  if (token) {
-    console.info('User is logged in')
-  } else {
-    console.info('User is not logged in')
-    const signupRoute = localePath({ name: 'signup' })
-    router.push(signupRoute)
-  }
-})
+<script lang="ts" setup>
 </script>
 
 <style scoped>

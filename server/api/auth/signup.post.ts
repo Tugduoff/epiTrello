@@ -8,6 +8,8 @@ interface SignupRequest {
   password: string;
 }
 
+export const activeTokens: { email: string; token: string }[] = [];
+
 export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody<SignupRequest>(event);
   const { name, email, password } = body;
@@ -37,5 +39,9 @@ export default defineEventHandler(async (event: H3Event) => {
     return { status: 500, body: { error: 'Failed to generate token' } };
   }
 
-  return { status: 201, body: { token } };
+  const definedToken: string = token as string;
+
+  activeTokens.push({ email, token: definedToken });
+
+  return { status: 201, body: { token, email, userId: newUser.id } };
 });

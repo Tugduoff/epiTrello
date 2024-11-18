@@ -16,10 +16,6 @@ import Cookies from 'js-cookie';
 
 const route = useRoute();
 const router = useRouter();
-const localePath = useLocalePath();
-
-const dashboardRoute = localePath('/dashboard');
-const signupRoute = localePath('/signup');
 
 onMounted(async () => {
   const code = route.query.code;
@@ -29,17 +25,38 @@ onMounted(async () => {
       const response = await axios.post('/api/auth/google/callback', { code });
 
       if (response.data.status !== 201)
-      throw new Error(response.data.body.error);
+        throw new Error(response.data.body.error);
 
-      Cookies.set('token', response.data.body.token, { expires: 1, sameSite: 'None', secure: true });
+      const email = response.data.body.email;
+      const token = response.data.body.token;
+
+      Cookies.set('token', token, { expires: 1, sameSite: 'None', secure: true });
+      Cookies.set('user', email, { expires: 1, sameSite: 'None', secure: true });
+
       console.log('Login successful:', response.data);
-      router.push(dashboardRoute);
+
+      try {
+        const response2 = await axios.get('/api/auth/user-id',
+          {
+            params: {
+              email
+            }
+          }
+        )
+
+        if (response2.status !== 200)
+          router.push('/login');
+
+        router.push('/user/' + response2.data.body.id);
+      } catch (error) {
+        console.error('Error:', error);
+        router.push('/login');
+      }
     } catch (err: any) {
       console.error('Error:', err);
     }
   } else {
     console.error('No code in query parameters');
-    // router.push(signupRoute);
   }
 });
 </script>

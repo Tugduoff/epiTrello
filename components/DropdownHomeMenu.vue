@@ -13,16 +13,16 @@
       v-if="showModal">
       <h1 class="text-gray-600 font-mono font-bold text-sm ml-3 mt-8 mb-2 text-start">YOUR APPS</h1>
       <div class="flex flex-col text-start justify-between px-1">
-        <a href="#" class="flex items-center focus:bg-gray-200 rounded-md transition duration-150 h-12">
+        <NuxtLink to="/" class="flex items-center focus:bg-gray-200 rounded-md transition duration-150 h-12">
           <Icon icon="mdi:trello" alt="" class="w-8 h-8 bg-blue-700 text-white p-2 rounded-md ml-2" />
-          <p class="ml-2 text-md font-sans text-slate-600">Trello</p>
-        </a>
+          <p class="ml-2 text-md font-sans text-gray-700">Trello</p>
+        </NuxtLink>
       </div>
       <div class="flex flex-col text-start justify-between px-1 mb-1">
-        <a href="#" class="flex items-center focus:bg-gray-200 rounded-md transition duration-150 h-12">
-          <Icon icon="mdi:trello" alt="" class="w-8 h-8 bg-green-500 text-white p-2 rounded-md ml-2" />
-          <p class="ml-2 text-md font-sans text-gray-700">Trellote</p>
-        </a>
+        <NuxtLink to="/admin" class="flex items-center focus:bg-gray-200 rounded-md transition duration-150 h-12">
+          <Icon icon="mdi:trello" alt="" class="w-8 h-8 bg-red-500 text-white p-2 rounded-md ml-2" />
+          <p class="ml-2 text-md font-sans text-gray-700">Trello Admin</p>
+        </NuxtLink>
       </div>
       <h1 class="text-gray-600 font-mono font-bold text-sm ml-3 mt-8 mb-2 text-start">DISCOVER MORE PRODUCTS</h1>
       <div class="flex flex-col text-start justify-between px-1 mb-1">
