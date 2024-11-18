@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Triggers -->
-    <div class="flex-full-row gap-1">
+    <div class="flex-full-row gap-1 z-50">
       <!-- Workspaces Button -->
       <div
         class="flex-full-row hover:bg-slate-200 focus:bg-blue-100 p-1 px-3 hover:focus:bg-blue-200 gap-2 rounded-sm h-7 cursor-pointer workspace-btn"
@@ -71,6 +71,14 @@
           <img src="assets/img/trello.png" alt="" class="min-w-10 max-w-10 max-h-10 min-h-10 bg-blue-700 text-white rounded-md border-none" />
           <p class="text-sm font-sans text-slate-600 truncate">Workspace from Mitchel de la brouette de manass</p>
         </a>
+      </div>
+      <hr class="mt-4 mb-6">
+      <h1 class="text-gray-600 font-mono font-medium text-sm ml-3 mt-3 mb-2 text-start">See my Workspaces</h1>
+      <div class="flex flex-col text-start justify-between px-1">
+        <NuxtLink :to="redirectToWorkspaces()" class="flex items-center focus:bg-gray-200 rounded-md transition duration-150 p-2 gap-2">
+          <img src="assets/img/trello.png" alt="" class="min-w-10 max-w-10 max-h-10 min-h-10 bg-blue-700 text-white rounded-md border-none" />
+          <p class="text-sm font-sans text-slate-600 truncate">All my workspaces</p>
+        </NuxtLink>
       </div>
     </div>
     <!-- Recent Menu -->
@@ -147,7 +155,7 @@
               :class="isStarred[1] ? 'text-yellow-300' : isHovered[1] ? 'text-slate-500' : 'text-white'"
               @mouseenter="isHovered[1] = true"
               @mouseleave="isHovered[1] = false"
-            />          
+            />
           </div>
         </a>
       </div>
@@ -199,6 +207,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+const userId = ref<string>(route.params.userId as string)
 
 // Manage open/close state for the menu items
 const isStarred = ref([true, true])
@@ -277,6 +290,10 @@ const handleClickOutside = (event: MouseEvent) => {
     openMenu.value = null
     console.log('clicked outside of Templates menu')
   }
+}
+
+const redirectToWorkspaces = () => {
+  return `/user/${userId.value}/workspaces`
 }
 
 onMounted(() => {

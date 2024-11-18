@@ -1,6 +1,7 @@
 import { getDatabase } from '~/server/middleware/db';
 import { verifyPassword, generateToken } from '~/server/utils/auth';
 import { H3Event, readBody } from 'h3';
+import { activeTokens } from './signup.post';
 
 interface LoginRequest {
   email: string;
@@ -31,5 +32,8 @@ export default defineEventHandler(async (event: H3Event) => {
     return { status: 500, body: { error: 'Failed to generate token' } };
   }
 
-  return { status: 200, body: { token } };
+  const definedToken: string = token as string;
+  activeTokens.push({ email, token: definedToken });
+
+  return { status: 200, body: { token, email, userId: user.id } };
 });

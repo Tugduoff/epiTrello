@@ -52,7 +52,7 @@
     </div>
 
     <div class="mt-4 text-center">
-      <NuxtLink :to="localePath('/signup')" class="text-blue-600 hover:underline text-sm">Don't have an account? Sign Up</NuxtLink>
+      <NuxtLink to="/signup" class="text-blue-600 hover:underline text-sm">Don't have an account? Sign Up</NuxtLink>
     </div>
   </div>
 </template>
@@ -64,10 +64,8 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'vue-router';
 import { useForm, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
-import { useLocalePath } from '#i18n';
 import { Icon } from '@iconify/vue';
 
-const localePath = useLocalePath();
 const router = useRouter();
 const error = ref('');
 
@@ -94,12 +92,12 @@ const submitForm = handleSubmit(async () => {
       throw new Error(response.data.body.error);
 
     Cookies.set('token', response.data.body.token, { expires: 1, sameSite: 'None', secure: true });
+    Cookies.set('user', response.data.body.email, { expires: 1, sameSite: 'None', secure: true });
     console.log('Login successful:', response.data);
 
     error.value = '';
 
-    const dashboardRoute = localePath({ name: 'dashboard' });
-    router.push(dashboardRoute);
+    router.push('/user/' + response.data.body.userId);
 
     console.log('User logged in');
   } catch (err: any) {
@@ -117,17 +115,6 @@ const loginWithGoogle = async () => {
     console.error(err);
   }
 };
-
-onMounted(() => {
-  const token = Cookies.get('token');
-  if (token) {
-    console.info('User is already logged in');
-    const dashboardRoute = localePath({ name: 'dashboard' });
-    router.push(dashboardRoute);
-  } else {
-    console.info('User is not logged in');
-  }
-});
 </script>
 
 <style scoped>

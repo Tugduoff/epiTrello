@@ -1,4 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config';
+import { type NuxtPage } from 'nuxt/schema';
 
 export default defineNuxtConfig({
   typescript: {
@@ -31,14 +32,14 @@ export default defineNuxtConfig({
     langDir: 'assets/langs/',
     strategy: 'no_prefix'
   },
-  css: ['~/assets/css/tailwind.css'],
   // css: [
-  //   'bootstrap/dist/css/bootstrap.min.css'
-  // ],
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
+    //   'bootstrap/dist/css/bootstrap.min.css'
+    // ],
+    postcss: {
+      plugins: {
+        tailwindcss: {},
+        autoprefixer: {},
+      },
     },
-  },
+    css: ['~/assets/css/tailwind.css'],
 });

@@ -1,0 +1,4 @@
+/workspaces/create.post
+/workspaces/[id].get
+/workspaces/[id]/update.put
+/workspaces/[id]/delete.delete

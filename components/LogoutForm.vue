@@ -29,8 +29,8 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Cookies from 'js-cookie';
 import { Icon } from '@iconify/vue';
+import axios from 'axios';
 
-const localePath = useLocalePath();
 const router = useRouter();
 const error = ref('');
 const userInfo = ref({
@@ -38,13 +38,17 @@ const userInfo = ref({
   email: 'sleepyPanda@gmail.com',
 });
 
-const handleLogout = () => {
+const handleLogout = async () => {
   try {
     // Remove the token from cookies
-    Cookies.remove('token');
+    const email = Cookies.get('user');
 
-    const loginRoute = localePath({ name: 'login' });
-    router.push(loginRoute);
+    await axios.post('/api/auth/logout', { email });
+
+    Cookies.remove('token');
+    Cookies.remove('user');
+
+    router.push('/login');
 
     console.log('User logged out');
   } catch (err) {
