@@ -28,7 +28,7 @@ export default defineEventHandler(async (_) => {
   try {
     const db = await getDatabase();
 
-    console.log('Connected to SQLite.');
+    // console.log('Connected to SQLite.');
 
     const schemaPath = path.join(process.cwd(), 'public', 'schema.sql');
     const schema = readFileSync(schemaPath, 'utf-8');
@@ -44,7 +44,7 @@ export default defineEventHandler(async (_) => {
             `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}'`
           );
           if (tableExists) {
-            console.log(`Table ${tableName} already exists. Skipping creation.`);
+            // console.log(`Table ${tableName} already exists. Skipping creation.`);
             continue;
           }
         }
@@ -56,14 +56,14 @@ export default defineEventHandler(async (_) => {
             `SELECT name FROM sqlite_master WHERE type='index' AND name='${indexName}'`
           );
           if (indexExists) {
-            console.log(`Index ${indexName} already exists. Skipping creation.`);
+            // console.log(`Index ${indexName} already exists. Skipping creation.`);
             continue;
           }
         }
       }
       await executeSql(db, statement);
     }
-    console.log('Database initialized successfully.');
+    // console.log('Database initialized successfully.');
   } catch (error) {
     console.error('Error initializing the database:', error);
   }

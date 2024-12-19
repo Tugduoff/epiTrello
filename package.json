@@ -30,6 +30,7 @@
     "vee-validate": "^4.13.2",
     "vue": "latest",
     "vue-router": "latest",
+    "vuedraggable": "^4.1.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

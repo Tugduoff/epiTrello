@@ -6,7 +6,7 @@
     </div>
     <div class="flex flex-row justify-between items-center gap-2" v-else>
       <input type="text" class="text-lg font-semibold w-11/12 px-2" v-model="list" @change="handleInput($event as InputEvent)" maxlength="15" />
-      <Icon icon="mdi:close" alt="" class="w-6 h-6 text-slate-800 p-1 rounded-[0.25rem] hover:bg-slate-300 cursor-pointer" @click.prevent="editMode = false"/>
+      <Icon icon="material-symbols:check" alt="" class="w-6 h-6 text-slate-800 p-1 rounded-[0.25rem] hover:bg-slate-300 cursor-pointer" @click.prevent="editMode = false"/>
     </div>
   </div>
 </template>

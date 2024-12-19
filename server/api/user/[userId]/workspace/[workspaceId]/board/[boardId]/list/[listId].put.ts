@@ -9,7 +9,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   // Read the body of the request to get updated list data
   const body = await readBody(event);
-  const { name } = body;
+  const { name, col } = body;
 
   // Validate that name is provided and not empty
   if (!name) {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event: H3Event) => {
   }
 
   // Query to update the list
-  const result = await db.run('UPDATE lists SET name = ? WHERE id = ?', [name, listId]);
+  const result = await db.run('UPDATE lists SET name = ?, column = ? WHERE id = ?', [name, col, listId]);
 
   // Check if the update was successful
   if (result.changes === 0) {

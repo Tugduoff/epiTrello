@@ -32,14 +32,11 @@ export default defineNuxtConfig({
     langDir: 'assets/langs/',
     strategy: 'no_prefix'
   },
-  // css: [
-    //   'bootstrap/dist/css/bootstrap.min.css'
-    // ],
-    postcss: {
-      plugins: {
-        tailwindcss: {},
-        autoprefixer: {},
-      },
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
     },
-    css: ['~/assets/css/tailwind.css'],
+  },
+  css: ['~/assets/css/tailwind.css'],
 });
