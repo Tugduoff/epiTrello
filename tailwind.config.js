@@ -39,6 +39,9 @@ export default {
       sky: colors.sky,
       lightGreen: colors.lightGreen,
     },
+    fontFamily: {
+      sans: ['noto-sans', 'sans-serif'],
+    },
   },
   plugins: [],
 }

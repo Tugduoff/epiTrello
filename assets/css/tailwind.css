@@ -1,3 +1,70 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(@/assets/fonts/Medium.ttf) format('woff2');
+    },
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url(@/assets/fonts/Bold.ttf) format('woff2');
+    },
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 900;
+        font-display: swap;
+        src: url(@/assets/fonts/Black.ttf) format('woff2');
+    },
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(@/assets/fonts/Regular.ttf) format('woff2');
+    },
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: url(@/assets/fonts/Light.ttf) format('woff2');
+    },
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 100;
+        font-display: swap;
+        src: url(@/assets/fonts/Thin.ttf) format('woff2');
+    },
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 200;
+        font-display: swap;
+        src: url(@/assets/fonts/ExtraLight.ttf) format('woff2');
+    },
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 800;
+        font-display: swap;
+        src: url(@/assets/fonts/ExtraBold.ttf) format('woff2');
+    },
+    @font-face {
+        font-family: 'noto-sans';
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url(@/assets/fonts/SemiBold.ttf) format('woff2');
+    }
+
+}

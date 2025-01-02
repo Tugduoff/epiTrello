@@ -1,7 +1,26 @@
 <template>
   <div class="bg-slate-100">
     <NuxtLayout name="user-layout">
-      <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Workspaces of user {{ userId }}</h1>
+      <div class="flex justify-center w-full">
+        <div class="flex flex-col gap-4">
+          <button class="flex gap-4">
+            <Icon icon="simple-icons:trello" class="text-slate-500 min-h-6 max-h-6 min-w-6 max-w-6 ml-1" />
+            <span class="text-sm font-medium">Boards</span>
+          </button>
+          <button class="flex gap-4">
+            <div class="relative">
+              <Icon icon="fluent:border-none-16-filled" class="text-slate-500 min-h-6 max-h-6 min-w-6 max-w-6" />
+              <Icon icon="mdi:trello" class="text-slate-500 min-h-6 max-h-6 min-w-6 max-w-6 absolute mt-[-19px] ml-[5px] bg-white" />
+            </div>
+            <span class="text-sm font-medium">Templates</span>
+          </button>
+          <button class="flex gap-4">
+            <Icon icon="gravity-ui:pulse" class="text-slate-500 min-h-6 max-h-6 min-w-6 max-w-6 ml-1" />
+            <span class="text-sm font-medium">Home</span>
+          </button>
+        </div>
+      </div>
+      <!-- <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Workspaces of user {{ userId }}</h1>
 
       <div v-if="workspaces.length === 0" class="text-center text-gray-600 text-lg">
         <p>No workspaces found</p>
@@ -34,7 +53,7 @@
       >
         <p>Create a new workspace!</p>
         <p class="text-sm font-normal mt-1">Click on this box to begin creation</p>
-      </div>
+      </div> -->
     </NuxtLayout>
   </div>
 </template>
