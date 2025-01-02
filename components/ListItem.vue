@@ -13,6 +13,7 @@
 
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
+import { ref } from 'vue';
 
 const editMode = ref(false)
 

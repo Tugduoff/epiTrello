@@ -29,6 +29,7 @@
     "uuid": "^10.0.0",
     "vee-validate": "^4.13.2",
     "vue": "latest",
+    "vue-cal": "^4.10.0",
     "vue-router": "latest",
     "vuedraggable": "^4.1.0",
     "yup": "^1.4.0"

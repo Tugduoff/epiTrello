@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex absolute gap-8 justify-center w-screen h-screen bg-[#1a181850] items-center" v-if="isCardModalOpen" @click.prevent="isCardModalOpen = false">
+    <div class="flex absolute gap-8 justify-center w-screen h-screen bg-[#1a181850] items-center z-[10000]" v-if="isCardModalOpen" @click.prevent="isCardModalOpen = false">
       <div v-if="isCardModalOpen" class="flex flex-row justify-center items-center" @click.prevent="isCardModalOpen = false">
         <div class="w-96 h-auto bg-white rounded-lg shadow-lg p-6 space-y-4" @click.stop>
           <div class="flex flex-row justify-between items-center gap-4 pb-2">
@@ -192,13 +192,17 @@
         <div class="flex gap-4 w-1/3 flex-row justify-end">
           <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/boards`" class="text-white py-1.5 bg-slate-900 rounded-xl px-6 hover:bg-slate-200 hover:text-black hover:border-slate-900 border-slate-200 border-2 transition duration-300">Back</NuxtLink>
           <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/`" class="text-white py-1.5 bg-slate-900 rounded-xl px-6 hover:bg-slate-200 hover:text-black hover:border-slate-900 border-slate-200 border-2 transition duration-300">Workspace</NuxtLink>
+          <div class="flex items-center">
+            <Icon icon="material-symbols:grid-view-outline-rounded" @click="changeView" class="w-6 h-6 hover:cursor-pointer"/>
+          </div>
           <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/board/${boardId}/settings`" class="p-2 hover:bg-slate-300 rounded-full transition duration-200" v-if="isOwner">
             <Icon icon="uil:setting" class="w-6 h-6 text-slate-800" />
           </NuxtLink>
         </div>
       </div>
       <div class="w-full overflow-x-scroll rounded-lg" :style="{ backgroundColor: boardColor }">
-        <div class="p-4 flex flex-row gap-4 height-adjusted overflow-y-scroll" :style="{ width: `${lists.length * 22 + 5}rem`, backgroundColor: boardColor }">
+        <div class="p-4 flex flex-row gap-4 height-adjusted overflow-y-scroll" :style="{ width: `${lists.length * 22 + 5}rem`, backgroundColor: boardColor }"
+          v-if="!isCalendarLayout">
           <div v-for="(list, i) in listsOrdered" :key="list.id" class="flex flex-col rounded-md w-[20rem]">
             <div class="flex flex-row">
               <ListItem :list="list.name" @updateName="(newName: string) => handleNameUpdate(list.id, newName)" class="bg-slate-300 p-2 rounded-md w-full" v-if="isOwner"/>
@@ -241,18 +245,42 @@
             +
           </button>
         </div>
+        <div v-if="isCalendarLayout" class="w-full height-adjusted ">
+          <!-- Calendar Layout -->
+          <vue-cal
+            :events="events"
+            events-on-month-view="short"
+            active-view="month"
+            :on-event-click="onEventClick"
+            @cell-dblclick="createCardForListAtDate($event)"
+            hide-title-bar
+            hide-view-selector
+            resize-x
+            :disable-views="['years', 'year', 'day', 'week']"
+            :editable-events="{ drag: true, resize: true, title: false, delete: false }">
+            <template #event="props">
+              <div
+                class="custom-event"
+                :style="{ backgroundColor: props.event.color, color: '#fff' }">
+                <span v-html="props.event.title"></span>
+              </div>
+            </template>
+          </vue-cal>
+        </div>
       </div>
     </NuxtLayout>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { Icon } from '@iconify/vue'
 import Cookies from 'js-cookie'
 import draggable from 'vuedraggable'
+import VueCal from 'vue-cal';
+import 'vue-cal/dist/vuecal.css';
 
 type CardItem = {
   title: string,
@@ -278,6 +306,25 @@ type CardItem = {
   color: string;
 }
 
+type CardAsEvent = {
+  start: string,
+  end: string,
+  title: string,
+  color: string,
+  id: number,
+  listId: number,
+  draggable: boolean,
+  allDay: boolean,
+  startTimeMinutes: number,
+  endTimeMinutes: number,
+  resizable: boolean,
+  titleEditable: boolean,
+  deletable: boolean
+}
+
+const events = ref<Array<CardAsEvent>>([])
+
+const isCalendarLayout = ref(true)
 const drag = ref(false)
 const priorities = ['Not Set', 'High', 'Medium', 'Low']
 const userEmail = Cookies.get('user')
@@ -304,6 +351,49 @@ const boardColor = ref('#eee')
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
+}
+
+function onEventClick(event: any) {
+  console.log('Event clicked:', event)
+  // find the card with the id from the event.
+
+  const card = cards.value[event.listId].find((card) => card.id === event.id)
+  if (!card) {
+    console.error('Card not found:', event.id)
+    return
+  }
+  openCardModal(card, { name: card.list.name, id: card.list.id })
+}
+
+function onEventDrag(event: any) {
+  event.startTimeMinutes = 0
+  event.endTimeMinutes = 0
+}
+
+function changeView() {
+  isCalendarLayout.value = !isCalendarLayout.value
+  if (isCalendarLayout.value) {
+    events.value = []
+    for (const list of lists.value) {
+      for (const card of cards.value[list.id]) {
+        events.value.push({
+          start: card.start_date || '',
+          end: card.due_date || '',
+          title: card.title,
+          color: card.color,
+          id: card.id,
+          listId: card.list.id,
+          draggable: true,
+          allDay: false,
+          startTimeMinutes: 0,
+          endTimeMinutes: 0,
+          resizable: true,
+          titleEditable: false,
+          deletable: false
+        })
+      }
+    }
+  }
 }
 
 async function assignCard(userId: number, cardId: number) {
@@ -496,6 +586,28 @@ const handleCardUpdate = async (cardId: number, newCard: CardItem) => {
     }
     forceUpdate.value++
     console.log('Updated card:', newCard)
+    if (isCalendarLayout.value) {
+      events.value = []
+      for (const list of lists.value) {
+        for (const card of cards.value[list.id]) {
+          events.value.push({
+            start: card.start_date || '',
+            end: card.due_date || '',
+            title: card.title,
+            color: card.color,
+            id: card.id,
+            listId: card.list.id,
+            draggable: true,
+            allDay: false,
+            startTimeMinutes: 0,
+            endTimeMinutes: 0,
+            resizable: true,
+            titleEditable: false,
+            deletable: false
+          })
+        }
+      }
+    }
   } catch (error) {
     console.error(error)
   }
@@ -602,20 +714,94 @@ const createList = async () => {
   }
 }
 
+// Get the date  in the format YYYY-MM-DD
+const formatDate = (date?: string) => {
+  if (date) {
+    const now = new Date(date);
+    return now.toISOString().slice(0, 19).replace('T', ' ').slice(0, 10);
+  }
+  const now = new Date();
+  return now.toISOString().slice(0, 19).replace('T', ' ').slice(0, 10);
+};
+
 const createCardForList = async (listId: number) => {
   const newCard = 'New Card'
   try {
     const res = await axios.post(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}/list/${listId}/card/create`, {
       title: newCard,
-      description: ''
+      description: '',
+      start_date: formatDate(),
+      due_date: formatDate(),
     });
     const listName = lists.value.find((list) => list.id === listId)?.name
     if (!listName) {
       console.error('List not found:', listId)
       return
     }
-    cards.value[listId].push({ title: newCard, description: '', id: res.data.card.id, list: { name: listName, id: listId }, labels: [], assignees: [], color: '#3b82f6' })
+    cards.value[listId].push({ title: newCard, description: '', id: res.data.card.id, list: { name: listName, id: listId }, labels: [], assignees: [], color: '#3b82f6', start_date: formatDate(), due_date: formatDate() })
     console.log(res.data)
+    events.value.push({
+      start: res.data.card.start_date || formatDate(),
+      end: res.data.card.due_date || formatDate(),
+      title: newCard,
+      color: '#3b82f6',
+      id: res.data.card.id,
+      listId: listId,
+      draggable: true,
+      allDay: false,
+      startTimeMinutes: 0,
+      endTimeMinutes: 0,
+      resizable: true,
+      titleEditable: false,
+      deletable: false
+    })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const createCardForListAtDate = async (date: string) => {
+  const newCard = 'New Card'
+  try {
+    // Get all the lists
+    let res = await axios.get(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}/lists`);
+    if (res.data.status !== 200) {
+      console.error('Failed to fetch lists:', res)
+      return
+    }
+    if (res.data.lists.length === 0) {
+      console.error('No lists found')
+      return
+    }
+    const listName = res.data.lists[0].name
+    const listId = res.data.lists[0].id
+    if (!listName || !listId) {
+      console.error('No lists found')
+      return
+    }
+    res = await axios.post(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}/list/${listId}/card/create`, {
+      title: newCard,
+      description: '',
+      start_date: formatDate(date),
+      due_date: formatDate(date),
+    });
+    cards.value[listId].push({ title: newCard, description: '', id: res.data.card.id, list: { name: listName, id: listId }, labels: [], assignees: [], color: '#3b82f6', start_date: formatDate(date), due_date: formatDate(date) })
+    console.log(res.data)
+    events.value.push({
+      start: res.data.card.start_date || formatDate(),
+      end: res.data.card.due_date || formatDate(),
+      title: newCard,
+      color: '#3b82f6',
+      id: res.data.card.id,
+      listId: listId,
+      draggable: true,
+      allDay: false,
+      startTimeMinutes: 0,
+      endTimeMinutes: 0,
+      resizable: true,
+      titleEditable: false,
+      deletable: false
+    })
   } catch (error) {
     console.error(error)
   }
@@ -665,6 +851,21 @@ const getCardsFromList = async (listId: number) => {
         }
       }
       card.list = { name: lists.value.find((list) => list.id === listId)?.name || '', id: listId }
+      events.value.push({
+        start: card.start_date || '',
+        end: card.due_date || '',
+        title: card.title,
+        color: card.color,
+        id: card.id,
+        listId: card.list.id,
+        draggable: true,
+        allDay: false,
+        startTimeMinutes: 0,
+        endTimeMinutes: 0,
+        resizable: true,
+        titleEditable: false,
+        deletable: false
+      })
       cards.value[listId].push(card)
     }
     console.log('Cards fetched:', cards.value)
@@ -732,6 +933,7 @@ onMounted(async() => {
     const res = await axios.get(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}/lists`);
     lists.value = res.data.lists
     console.log('Lists fetched:', lists.value)
+    events.value = []
     for (const list of lists.value) {
       await getCardsFromList(list.id)
     }
@@ -744,5 +946,23 @@ onMounted(async() => {
 <style scoped>
 .height-adjusted {
   height: calc(100vh - 14rem);
+}
+</style>
+
+<style>
+.vuecal__event.card {
+  border: 1px solid rgb(233, 136, 46);
+  color: #fff;
+}
+.custom-event {
+  cursor: pointer;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vuecal__flex .weekday-label {
+  color: #444;
+  font-weight: bold;
 }
 </style>

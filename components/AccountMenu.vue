@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="z-[10000]">
     <img
       src="@/assets/img/sleepPanda.png"
       alt=""

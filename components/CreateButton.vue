@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter, useRoute } from 'vue-router'
 

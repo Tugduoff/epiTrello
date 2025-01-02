@@ -1,5 +1,5 @@
 <template>
-  <nav class="p-2 border-solid border-b-[1px] border-gray-200">
+  <nav class="p-2 border-solid border-b-[1px] border-gray-200 z-[100000]">
     <div class="flex justify-between text-center flex-row w-full">
       <div class="flex flex-row justify-start text-center gap-1">
         <div class="flex flex-row justify-start items-center">

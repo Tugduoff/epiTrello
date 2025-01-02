@@ -23,7 +23,7 @@ export default defineEventHandler(async (event: H3Event) => {
     INSERT INTO cards (list_id, title, description, priority, due_date, start_date, color)
     VALUES (?, ?, ?, ?, ?, ?, ?)
     `,
-    [listId, title, description, priority || 0, due_date || null, start_date || null, color || '#3b82f6']
+    [listId, title, description, priority || 0, due_date || null, start_date || null, color || '#3b82f6'] // if start date is null, it will be set to the current date
   );
 
   // Retrieve the last inserted row ID

@@ -71,6 +71,7 @@
 
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 const search = ref("")
 const searchBarOpen = ref(false)

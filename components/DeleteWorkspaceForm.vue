@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Cookies from 'js-cookie';
 import { Icon } from '@iconify/vue';
@@ -84,7 +84,9 @@ const fetchWorkspace = async () => {
   }
 }
 // Fetch user data on component mount
-onMounted(fetchWorkspace);
+onMounted(async () => {
+  fetchWorkspace
+});
 </script>
 
 <style scoped>
