@@ -5,7 +5,7 @@
         <UpdateWorkspaceForm :workspaceId="workspaceId" :userId="userId" />
         <div class="space-x-4">
           <!-- Back to User Dashboard Button -->
-          <NuxtLink :to="`/user/${userId}/workspaces/`" class="px-4 py-2 text-blue-500 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white transition">
+          <NuxtLink :to="`/user/${userId}`" class="px-4 py-2 text-blue-500 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white transition">
             User Workspaces
           </NuxtLink>
 

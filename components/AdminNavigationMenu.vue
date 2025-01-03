@@ -36,7 +36,7 @@
       <h1 class="text-gray-600 font-mono font-medium text-sm ml-3 mt-3 mb-2 text-start">Users</h1>
       <div class="flex flex-col text-start justify-between px-1">
         <NuxtLink to="/admin/users" class="flex flex-row items-center focus:bg-gray-200 hover:bg-gray-100 rounded-md transition duration-150 p-2 gap-2">
-          <Icon icon="fluent:people-16-regular" alt="" class="w-6 h-6 text-slate-600 p-1 rounded-[0.25rem] hover:bg-slate-200 cursor-pointer" />
+          <Icon icon="mdi:account-multiple" alt="" class="w-6 h-6 text-slate-600 p-1 rounded-[0.25rem] hover:bg-slate-200 cursor-pointer" />
           <p class="text-sm font-sans text-slate-600 truncate">All Users</p>
         </NuxtLink>
         <NuxtLink to="/admin/user/create" class="flex items-center focus:bg-gray-200 hover:bg-gray-100 rounded-md transition duration-150 p-2 gap-2">

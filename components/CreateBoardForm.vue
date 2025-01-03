@@ -88,10 +88,11 @@ const submitForm = handleSubmit(async () => {
       name: form.value.name,
       description: form.value.description,
     });
+    console.log('Response:', response);
     const data = response.data;
 
     if (data.status !== 201) {
-      throw new Error(response.data.message);
+      throw new Error(response.data.body.error);
     }
 
     console.log('Board creation successful:', response.data);

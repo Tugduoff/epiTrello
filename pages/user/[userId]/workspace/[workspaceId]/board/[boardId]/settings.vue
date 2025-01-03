@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout name="user-layout">
+  <NuxtLayout name="user-layout" :key="board.color">
     <!-- Settings Header -->
     <div class="h-16 w-full flex justify-between items-center px-6 bg-slate-200 rounded-lg shadow-md mb-4">
       <p class="text-2xl font-semibold text-slate-800 w-1/3">Board Settings</p>
@@ -183,10 +183,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { Icon } from '@iconify/vue'
+import Cookies from 'js-cookie'
 
 const route = useRoute()
 
@@ -245,6 +246,8 @@ const updateBoardSettings = async () => {
   board.value.name = boardInput.value.name
   board.value.description = boardInput.value.description
   board.value.color = boardInput.value.color
+
+  Cookies.set('boardColor', board.value.color)
 
   const res = await axios.put(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}`, {
     name: boardInput.value.name,

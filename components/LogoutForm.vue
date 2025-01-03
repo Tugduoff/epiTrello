@@ -8,10 +8,10 @@
     <h2 class="text-md font-bold mb-4 text-slate-600 text-center">Log out of epiTrello</h2>
 
     <div class="flex flex-row justify-start items-center gap-6 mb-4">
-      <img src="~/assets/img/background.jpg" alt="" class="w-12 h-12 rounded-full object-cover" />
+      <img src="@/assets/img/sleepPanda.png" alt="" class="w-12 h-12 rounded-full object-cover" />
       <div class="flex flex-col justify-between items-start">
-        <p class="text-lg text-slate-800">{{ userInfo.name }}</p>
-        <p class="text-sm text-slate-600">{{ userInfo.email }}</p>
+        <p class="text-lg text-slate-700" v-if="user && user.name">{{ user.name }}</p>
+        <p class="text-sm text-slate-600" v-if="user && user.email">{{ user.email }}</p>
       </div>
     </div>
     <button
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import Cookies from 'js-cookie';
 import { Icon } from '@iconify/vue';
@@ -33,10 +33,11 @@ import axios from 'axios';
 
 const router = useRouter();
 const error = ref('');
-const userInfo = ref({
-  name: 'Sleepy Panda',
-  email: 'sleepyPanda@gmail.com',
-});
+const user = ref<{
+  name?: string,
+  email?: string
+}>({})
+const userEmail = Cookies.get('user')
 
 const handleLogout = async () => {
   try {
@@ -55,6 +56,24 @@ const handleLogout = async () => {
     error.value = 'Logout failed. Please try again.';
   }
 };
+
+async function fetchRealUser() {
+  try {
+    const res = await axios.get(`/api/user/mail?email=${userEmail}`)
+
+    if (res.data.status === 200) {
+      user.value = res.data.user
+    } else {
+      console.error('Failed to fetch user', res)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(async () => {
+  await fetchRealUser()
+})
 </script>
 
 <style scoped>

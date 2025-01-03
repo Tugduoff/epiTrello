@@ -3,13 +3,13 @@
       <div class="flex justify-between text-center flex-row w-full">
         <div class="flex flex-row justify-start text-center gap-1">
           <div class="flex flex-row justify-start items-center">
-            <DropdownHomeMenu class="h-7"/>
-            <TitleButton class="h-7"/>
+            <DropdownHomeMenu class="h-7" color="#f1f5f9" />
+            <TitleButton class="h-7" color="#f1f5f9"/>
           </div>
         </div>
         <div class="flex flex-row justify-end text-center gap-1.5">
-          <SearchBar class="h-7"/>
-          <HelpButton class="h-7"/>
+          <SearchBar class="h-7" color="#f1f5f9"/>
+          <HelpButton class="h-7" color="#f1f5f9"/>
         </div>
       </div>
     </nav>
@@ -31,7 +31,7 @@
           </div>
         </div>
       </section>
-  
+
       <!-- Features Section -->
       <section class="py-16 bg-white">
         <div class="max-w-6xl mx-auto text-center">

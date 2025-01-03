@@ -1,4 +1,41 @@
 <template>
+  <div v-if="addMemberToWorkspacePopup"
+    class="absolute top-0 z-[100000000] w-screen h-screen bg-black/50 flex justify-center items-center"
+    @click="addMemberToWorkspacePopup = false; inviteMemberToWorkspaceValue = ''; inputMemberError = null"
+    @keydown.enter.prevent="submitInviteMemberToWorkspace">
+    <div class="relative w-[30rem] bg-white shadow-lg rounded-lg p-6"
+      @click.stop>
+      <!-- Close Button -->
+      <button @click="addMemberToWorkspacePopup = false; inviteMemberToWorkspaceValue = ''; inputMemberError = null" 
+        class="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+        <Icon icon="mdi:close" class="w-5 h-5" />
+      </button>
+
+      <!-- Header -->
+      <h2 class="text-lg font-semibold text-slate-800 mb-4">Invite to Workspace</h2>
+
+      <!-- Input Field -->
+      <input type="email" 
+        class="w-full h-10 border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4" 
+        placeholder="Enter email address"
+        v-model="inviteMemberToWorkspaceValue"
+        @change="inputMemberError = null" />
+
+      <p v-if="inputMemberError" class="text-red-500 text-sm mb-4">{{ inputMemberError }}</p>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-3">
+        <button @click="addMemberToWorkspacePopup = false; inviteMemberToWorkspaceValue = ''; inputMemberError = null" 
+          class="py-2 px-4 text-gray-600 hover:bg-gray-100 rounded-md">
+          Cancel
+        </button>
+        <button @click="submitInviteMemberToWorkspace" type="submit"
+          class="py-2 px-4 bg-blue-600 text-white hover:bg-blue-700 rounded-md">
+          Invite
+        </button>
+      </div>
+    </div>
+  </div>
   <div>
     <div class="flex absolute gap-8 justify-center w-screen h-screen bg-[#1a181850] items-center z-[10000]" v-if="isCardModalOpen" @click.prevent="isCardModalOpen = false">
       <div v-if="isCardModalOpen" class="flex flex-row justify-center items-center" @click.prevent="isCardModalOpen = false">
@@ -182,90 +219,186 @@
       </div>
     </div>
 
-    <NuxtLayout name="user-layout">
-      <div class="h-16 w-full flex justify-between items-center px-6 bg-slate-200 rounded-lg shadow-md mb-4">
-        <p class="text-2xl font-semibold text-slate-800 w-1/3">Board</p>
-
-        <ListItem :list="boardName" @updateName="(newName: string) => updateBoardName(newName)" class="bg-slate-300 p-2 rounded-md w-1/3" v-if="boardName && isOwner"/>
-        <p v-else-if="boardName" class="text-lg font-semibold px-2">{{ boardName }}</p>
-
-        <div class="flex gap-4 w-1/3 flex-row justify-end">
-          <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/boards`" class="text-white py-1.5 bg-slate-900 rounded-xl px-6 hover:bg-slate-200 hover:text-black hover:border-slate-900 border-slate-200 border-2 transition duration-300">Back</NuxtLink>
-          <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/`" class="text-white py-1.5 bg-slate-900 rounded-xl px-6 hover:bg-slate-200 hover:text-black hover:border-slate-900 border-slate-200 border-2 transition duration-300">Workspace</NuxtLink>
-          <div class="flex items-center">
-            <Icon icon="material-symbols:grid-view-outline-rounded" @click="changeView" class="w-6 h-6 hover:cursor-pointer"/>
+    <NuxtLayout name="user-layout" v-if="boardColor">
+      <div class="flex h-full w-full">
+        <!-- Sidebar -->
+        <div class="flex flex-col flex-shrink-0 !w-[18rem] border-r before:!w-[18rem] before:h-full before:absolute overflow-hidden before:left-0 before:top-0 relative h-full before:bg-[--before-bg-color] before:opacity-70"
+          :style="{ '--before-bg-color': boardColor, borderColor: isLightColor(boardColor) ? '#eee' : boardColor }"
+          v-if="sidebarOpen">
+          <!-- Workspace Name and Icon -->
+          <div class="flex gap-2 items-center justify-between py-2 pl-2 pr-4 z-50">
+            <div class="flex gap-2 items-center">
+              <div class="w-10 h-10 rounded-md flex items-center justify-center" 
+                :style="{ backgroundColor: '#000077' }">
+                <span class="font-extrabold text-white" v-if="workspace.name">
+                  {{ workspace.name.charAt(0).toUpperCase() }}
+                </span>
+              </div>
+              <div class="flex flex-col justify-center">
+                <div class="flex gap-2 items-center">
+                  <h2 class="text-md font-semibold" :style="{ color: computeFromContrast(boardColor) }" v-if="workspace && workspace.name">{{ workspace.name }}</h2>
+                  <Icon icon="mdi:crown" class="w-4 h-4 text-yellow-500" v-if="workspace.owner_id == userId" />
+                </div>
+                <p class="text-xs" :style="{ color: computeFromContrast(boardColor) }" v-if="workspace.members">{{ workspace.members.length + 1 }} Member{{ workspace.members.length + 1 > 1 ? 's' : '' }}</p>
+              </div>
+            </div>
+            <Icon icon="mdi:chevron-left" class="w-8 h-8 p-1 hover:bg-[--hover-sidebar-color] rounded-md hover:cursor-pointer"
+              @click="sidebarOpen = false"
+              :style="{ color: computeFromContrast(boardColor), '--hover-sidebar-color': getLighterColor(boardColor, 45) }" />
           </div>
-          <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/board/${boardId}/settings`" class="p-2 hover:bg-slate-300 rounded-full transition duration-200" v-if="isOwner">
-            <Icon icon="uil:setting" class="w-6 h-6 text-slate-800" />
-          </NuxtLink>
-        </div>
-      </div>
-      <div class="w-full overflow-x-scroll rounded-lg" :style="{ backgroundColor: boardColor }">
-        <div class="p-4 flex flex-row gap-4 height-adjusted overflow-y-scroll" :style="{ width: `${lists.length * 22 + 5}rem`, backgroundColor: boardColor }"
-          v-if="!isCalendarLayout">
-          <div v-for="(list, i) in listsOrdered" :key="list.id" class="flex flex-col rounded-md w-[20rem]">
-            <div class="flex flex-row">
-              <ListItem :list="list.name" @updateName="(newName: string) => handleNameUpdate(list.id, newName)" class="bg-slate-300 p-2 rounded-md w-full" v-if="isOwner"/>
-              <div class="bg-slate-300 p-2 rounded-md w-full flex flex-row justify-between items-center" v-else>
-                <p class="text-lg font-semibold px-2">{{ list.name }}</p>
-              </div>
-              <button class="bg-red-500 hover:bg-red-600 rounded-md cursor-pointer w-[3rem] h-[3rem] p-3" @click.prevent="deleteList(list.id)" v-if="isOwner">
-                <Icon icon="bi:trash" class="w-6 h-5 text-white" />
-              </button>
-            </div>
-            <div class="flex flex-col gap-2 mt-2 bg-slate-200 p-2 rounded-md">
-              <draggable v-model="cards[list.id]" group="people" @start="drag=true" @end="drag=false; updateLists()" item-key="id" v-if="isOwner">
-                <template #item="{element}">
-                  <div class="rounded-md hover:bg-blue-600 cursor-pointer mb-2" :style="{ backgroundColor: element.color }">
-                    <CardItem :card="element" @updateCard="(newCard: CardItem) => handleCardUpdate(element.id, newCard)" @openCardModal="openCardModal(element, { name: list.name, id: list.id })" />
-                  </div>
-                </template>
-              </draggable>
-              <div class="p-1 rounded-md pl-3 hover:bg-blue-600 cursor-pointer" v-for="(card) in cards[list.id]" :key="card.id + '-' + forceUpdate" :style="{ backgroundColor: card.color }" v-else>
-                <CardItem :card="card" @updateCard="(newCard: CardItem) => handleCardUpdate(card.id, newCard)" @openCardModal="openCardModal(card, { name: list.name, id: list.id })" />
-              </div>
-              <button class="bg-slate-300 hover:bg-slate-400 rounded-md cursor-pointer w-full h-[2rem]" @click.prevent="createCardForList(list.id)" v-if="isOwner">
-                Add new card
-              </button>
-              <div class="flex flex-row justify-between items-center">
-                <button class="rounded-md cursor-pointer w-1/4 h-[2rem]" :disabled="list.column == 0"
-                  :class="list.column == 0 ? 'bg-gray-500 hover:bg-gray-600' : 'bg-red-500 hover:bg-red-600'" @click.prevent="switchCol(list.id, list.column, -1, false)" v-if="isOwner">
-                  <
-                </button>
-                <button class="rounded-md cursor-pointer w-1/4 h-[2rem]" :disabled="list.column == lists.length - 1"
-                  :class="list.column == listsOrdered.length - 1 ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-500 hover:bg-blue-600'" @click.prevent="switchCol(list.id, list.column, 1, false)" v-if="isOwner">
-                  >
-                </button>
-              </div>
-            </div>
-            <div class="py-2 bg-transparent">
-            </div>
+          <hr class="z-50"
+            :style="{ borderColor: boardColor }" />
+
+          <!-- Navigation Buttons -->
+          <div class="py-2 w-full z-50">
+            <button class="flex gap-4 py-1 hover:bg-[--hover-sidebar-color] items-center w-full"
+              :style="{ color: computeFromContrast(boardColor), '--hover-sidebar-color': getLighterColor(boardColor, 45) }"
+              @click="redirectToWorkspaceBoards(workspace.id)">
+              <Icon icon="mdi:view-dashboard" class="min-h-6 max-h-6 min-w-6 max-w-6 ml-3" />
+              <span class="text-sm font-medium">Boards</span>
+            </button>
+            <button class="flex gap-4 py-1 hover:bg-[--hover-sidebar-color] relative overflow-hidden group items-center w-full"
+              :style="{ color: computeFromContrast(boardColor), '--hover-sidebar-color': getLighterColor(boardColor, 45), '--hover-sidebar-color-lighter': getLighterColor(boardColor, 60) }"
+              @click.stop="redirectToWorkspaceMembers(workspace.id)">
+              <Icon icon="mdi:account-multiple" class="min-h-6 max-h-6 min-w-6 max-w-6 ml-3" />
+              <span class="text-sm font-medium">Members</span>
+              <Icon icon="mdi:plus" class="w-5 h-5 absolute right-2 hover:bg-[--hover-sidebar-color-lighter] rounded-sm" v-if="isOwner"
+                  @click.stop="showAddMemberToWorkspacePopup(workspace.id)" />
+            </button>
+            <button class="flex gap-4 py-1 hover:bg-[--hover-sidebar-color] relative overflow-hidden group items-center w-full"
+              :style="{ color: computeFromContrast(boardColor), '--hover-sidebar-color': getLighterColor(boardColor, 45) }"
+              @click.stop="redirectToWorkspaceSettings(workspace.id)">
+              <Icon icon="mdi:cog" class="min-h-6 max-h-6 min-w-6 max-w-6 ml-3" />
+              <span class="text-sm font-medium">Settings</span>
+            </button>
           </div>
-          <button class="bg-slate-300 hover:bg-slate-400 rounded-md cursor-pointer w-[3rem] h-[3rem]" @click="createList()" v-if="isOwner">
-            +
+
+          <!-- Boards List -->
+          <div class="mt-1 z-50">
+            <div class="flex justify-between items-center mb-3 relative">
+              <p class="text-sm font-semibold text-gray-700 ml-3"
+                :style="{ color: computeFromContrast(boardColor) }">Your Boards</p>
+              <Icon icon="mdi:plus" class="text-slate-600 w-5 h-5 absolute right-2 hover:bg-[--hover-sidebar-color-lighter] rounded-sm hover:cursor-pointer"
+                :style="{ color: computeFromContrast(boardColor), '--hover-sidebar-color-lighter': getLighterColor(boardColor, 45) }" v-if="isOwner"
+                @click.stop="redirectToCreateBoard" />
+            </div>
+            <button v-for="(board, i) in workspace.boards" :key="board.id"
+              class="flex gap-4 py-1 hover:bg-[--hover-sidebar-color] items-center w-full"
+              :style="{ backgroundColor: board.id == boardId ? getLighterColor(boardColor, 65) : '', color: computeFromContrast(boardColor), '--hover-sidebar-color': getLighterColor(boardColor, 45) }"
+              @click="redirectToWorkspaceBoard(workspace.id, workspace.owner_id, board.id)">
+              <div class="w-9 h-7 rounded-sm flex items-center justify-center ml-3" 
+                :style="{ backgroundColor: board.color }">
+              </div>
+              <span class="text-sm font-medium">{{ board.name }}</span>
+            </button>
+          </div>
+          <button class="absolute bottom-0 w-full flex items-center justify-center gap-4 py-2 hover:bg-[--hover-sidebar-color]"
+            :style="{ backgroundColor: getLighterColor(boardColor, 15), color: computeFromContrast(boardColor) }"
+            @click="redirectToWorkspaces">
+            <Icon icon="mdi:arrow-back-circle" class="w-6 h-6" />
+            <span class="text-md font-bold">Back</span>
           </button>
         </div>
-        <div v-if="isCalendarLayout" class="w-full height-adjusted ">
-          <!-- Calendar Layout -->
-          <vue-cal
-            :events="events"
-            events-on-month-view="short"
-            active-view="month"
-            :on-event-click="onEventClick"
-            @cell-dblclick="createCardForListAtDate($event)"
-            hide-title-bar
-            hide-view-selector
-            resize-x
-            :disable-views="['years', 'year', 'day', 'week']"
-            :editable-events="{ drag: true, resize: true, title: false, delete: false }">
-            <template #event="props">
-              <div
-                class="custom-event"
-                :style="{ backgroundColor: props.event.color, color: '#fff' }">
-                <span v-html="props.event.title"></span>
+
+        <div v-else class="h-full before:w-4 before:h-full before:absolute before:top-0 before:left-0 before:bg-[--before-bg-color] before:opacity-70 w-4 hover:cursor-pointer relative"
+          :style="{ '--before-bg-color': getLighterColor(boardColor, 15), borderColor: boardColor }"
+          @click="sidebarOpen = true">
+          <Icon icon="mdi:chevron-right" class="absolute bottom-4 left-1 w-6 h-6 p-0.5 z-[10000] text-gray-700 bg-gray-300 rounded-full hover:cursor-pointer"
+            :style="{ backgroundColor: getLighterColor(boardColor, 65), color: computeFromContrast(boardColor) }" />
+        </div>
+
+        <!-- Board Content -->
+        <div class="flex flex-col w-full h-full">
+          <!-- Top Bar -->
+          <div class="h-[57px] w-full flex flex-shrink-0 justify-between items-center px-2 before-bg-color before:opacity-70 before:absolute before:w-full before:h-[57px] before:top-0 before:left-0 relative z-0 border-b border-gray-400"
+            :style="{ '--board-before-color': boardColor }">
+
+            <ListItem :list="boardName" @updateName="(newName: string) => updateBoardName(newName)" class="bg-slate-300 p-2 rounded-md w-1/3 z-10" v-if="boardName && isOwner"/>
+            <p v-else-if="boardName" class="text-lg font-semibold px-2 z-10">{{ boardName }}</p>
+
+            <div class="flex gap-2 w-1/3 flex-row justify-end z-10">
+              <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/boards`" class="text-white py-1.5 bg-slate-900 rounded-xl px-6 hover:bg-slate-200 hover:text-black hover:border-slate-900 border-slate-200 border-2 transition duration-300">Back</NuxtLink>
+              <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/`" class="text-white py-1.5 bg-slate-900 rounded-xl px-6 hover:bg-slate-200 hover:text-black hover:border-slate-900 border-slate-200 border-2 transition duration-300 mx-2">Workspace</NuxtLink>
+              <div class="flex items-center hover:bg-[--hover-topbar-color] rounded-full p-2 transition duration-200"
+                :style="{ color: computeFromContrast(boardColor), '--hover-topbar-color': getLighterColor(boardColor, 50) }">
+                <Icon icon="material-symbols:grid-view-outline-rounded" @click="changeView" class="w-6 h-6 hover:cursor-pointer"/>
               </div>
-            </template>
-          </vue-cal>
+              <NuxtLink :to="`/user/${userId}/workspace/${workspaceId}/board/${boardId}/settings`" class="p-2 hover:bg-[--hover-topbar-color] rounded-full transition duration-200"
+                :style="{ color: computeFromContrast(boardColor), '--hover-topbar-color': getLighterColor(boardColor, 50) }" v-if="isOwner">
+                <Icon icon="uil:setting" class="w-6 h-6" />
+              </NuxtLink>
+            </div>
+          </div>
+
+          <!-- Board -->
+          <div class="w-full overflow-x-scroll h-full" :style="{ backgroundColor: boardColor }">
+            <div class="p-4 flex flex-row gap-4 height-adjusted overflow-y-scroll" :style="{ width: `${lists.length * 22 + 5}rem`, backgroundColor: boardColor }"
+              v-if="!isCalendarLayout">
+              <div v-for="(list, i) in listsOrdered" :key="list.id" class="flex flex-col rounded-md w-[20rem]">
+                <div class="flex flex-row">
+                  <ListItem :list="list.name" @updateName="(newName: string) => handleNameUpdate(list.id, newName)" class="bg-slate-300 p-2 rounded-md w-full" v-if="isOwner"/>
+                  <div class="bg-slate-300 p-2 rounded-md w-full flex flex-row justify-between items-center" v-else>
+                    <p class="text-lg font-semibold px-2">{{ list.name }}</p>
+                  </div>
+                  <button class="bg-red-500 hover:bg-red-600 rounded-md cursor-pointer w-[3rem] h-[3rem] p-3" @click.prevent="deleteList(list.id)" v-if="isOwner">
+                    <Icon icon="bi:trash" class="w-6 h-5 text-white" />
+                  </button>
+                </div>
+                <div class="flex flex-col gap-2 mt-2 bg-slate-200 p-2 rounded-md">
+                  <draggable v-model="cards[list.id]" group="people" @start="drag=true" @end="drag=false; updateLists()" item-key="id" v-if="isOwner">
+                    <template #item="{element}">
+                      <div class="rounded-md hover:bg-blue-600 cursor-pointer mb-2" :style="{ backgroundColor: element.color }">
+                        <CardItem :card="element" @updateCard="(newCard: CardItem) => handleCardUpdate(element.id, newCard)" @openCardModal="openCardModal(element, { name: list.name, id: list.id })" />
+                      </div>
+                    </template>
+                  </draggable>
+                  <div class="p-1 rounded-md pl-3 hover:bg-blue-600 cursor-pointer" v-for="(card) in cards[list.id]" :key="card.id + '-' + forceUpdate" :style="{ backgroundColor: card.color }" v-else>
+                    <CardItem :card="card" @updateCard="(newCard: CardItem) => handleCardUpdate(card.id, newCard)" @openCardModal="openCardModal(card, { name: list.name, id: list.id })" />
+                  </div>
+                  <button class="bg-slate-300 hover:bg-slate-400 rounded-md cursor-pointer w-full h-[2rem]" @click.prevent="createCardForList(list.id)" v-if="isOwner">
+                    Add new card
+                  </button>
+                  <div class="flex flex-row justify-between items-center">
+                    <button class="rounded-md cursor-pointer w-1/4 h-[2rem]" :disabled="list.column == 0"
+                      :class="list.column == 0 ? 'bg-gray-500 hover:bg-gray-600' : 'bg-red-500 hover:bg-red-600'" @click.prevent="switchCol(list.id, list.column, -1, false)" v-if="isOwner">
+                      <
+                    </button>
+                    <button class="rounded-md cursor-pointer w-1/4 h-[2rem]" :disabled="list.column == lists.length - 1"
+                      :class="list.column == listsOrdered.length - 1 ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-500 hover:bg-blue-600'" @click.prevent="switchCol(list.id, list.column, 1, false)" v-if="isOwner">
+                      >
+                    </button>
+                  </div>
+                </div>
+                <div class="py-2 bg-transparent">
+                </div>
+              </div>
+              <button class="bg-slate-300 hover:bg-slate-400 rounded-md cursor-pointer w-[3rem] h-[3rem]" @click="createList()" v-if="isOwner">
+                +
+              </button>
+            </div>
+            <div v-if="isCalendarLayout" class="w-full height-adjusted ">
+              <!-- Calendar Layout -->
+              <vue-cal
+                :events="events"
+                events-on-month-view="short"
+                active-view="month"
+                :on-event-click="onEventClick"
+                @cell-dblclick="createCardForListAtDate($event)"
+                hide-title-bar
+                hide-view-selector
+                resize-x
+                :disable-views="['years', 'year', 'day', 'week']"
+                :editable-events="{ drag: true, resize: true, title: false, delete: false }">
+                <template #event="props">
+                  <div
+                    class="custom-event"
+                    :style="{ backgroundColor: props.event.color, color: '#fff' }">
+                    <span v-html="props.event.title"></span>
+                  </div>
+                </template>
+              </vue-cal>
+            </div>
+          </div>
         </div>
       </div>
     </NuxtLayout>
@@ -274,7 +407,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { Icon } from '@iconify/vue'
 import Cookies from 'js-cookie'
@@ -324,7 +457,9 @@ type CardAsEvent = {
 
 const events = ref<Array<CardAsEvent>>([])
 
-const isCalendarLayout = ref(true)
+const sidebarOpen = ref<boolean>(true)
+const workspace = ref<any>({})
+const isCalendarLayout = ref(false)
 const drag = ref(false)
 const priorities = ['Not Set', 'High', 'Medium', 'Low']
 const userEmail = Cookies.get('user')
@@ -343,14 +478,192 @@ const cardPotentialAssignees = computed(() => {
 })
 
 const route = useRoute()
+const router = useRouter()
+
+const workspaceUserId = ref<string>(route.params.userId as string)
+
 const forceUpdate = ref(0)
 const isCardModalOpen = ref(false)
 const openedCard = ref<CardItem>({ title: '', description: '', priority: 0, id: 0, list: { name: '', id: 0 }, labels: [], assignees: [], color: '#3b82f6' })
 const boardName = ref('')
-const boardColor = ref('#eee')
+const boardColor = ref('')
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
+}
+
+function isLightColor(color: string): boolean {
+  // Remove the hash if present
+  color = color.replace(/^#/, '');
+
+  // Parse the color into its RGB components
+  const r = parseInt(color.substring(0, 2), 16);
+  const g = parseInt(color.substring(2, 4), 16);
+  const b = parseInt(color.substring(4, 6), 16);
+
+  // Calculate the YIQ value (perceived brightness)
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+
+  // Check if the color is light or white
+  return yiq > 200; // Threshold for "light" can be adjusted
+}
+
+function getLighterColor(color: string, percent: number = 10): string {
+  // Remove the hash if present
+  const contrast = computeFromContrast(color)
+
+  color = color.replace(/^#/, '');
+
+  // Parse the color into its RGB components
+  let r = parseInt(color.substring(0, 2), 16);
+  let g = parseInt(color.substring(2, 4), 16);
+  let b = parseInt(color.substring(4, 6), 16);
+
+  // check if the contrast is black or white:
+  // if the resulting color is white, then we darken the color, else we lighten it
+  if (contrast == '#1e293b') {
+    percent = percent == 0 ? 0 : percent / 2
+    // Darken each component
+    r = Math.max(0, Math.round(r * (1 - percent / 100)));
+    g = Math.max(0, Math.round(g * (1 - percent / 100)));
+    b = Math.max(0, Math.round(b * (1 - percent / 100)));
+  } else {
+    // Lighten each component
+    r = Math.min(255, Math.round(r + (255 - r) * (percent / 100)));
+    g = Math.min(255, Math.round(g + (255 - g) * (percent / 100)));
+    b = Math.min(255, Math.round(b + (255 - b) * (percent / 100)));
+  }
+
+  // Convert back to hexadecimal and return the color
+  const newColor = `#${r.toString(16).padStart(2, '0')}${g
+    .toString(16)
+    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+  return newColor;
+}
+
+// Either returns text-white or text-slate-700 based on the contrast of the color
+function computeFromContrast(color: string) {
+  // Ensure the color starts with '#' and is in the correct format
+  if (!/^#([0-9A-Fa-f]{6})$/.test(color)) {
+    throw new Error('Invalid color format. Use #RRGGBB format.')
+  }
+
+  console.log('Computing contrast for color', color)
+
+  // Extract RGB values
+  const r = parseInt(color.substring(1, 3), 16)
+  const g = parseInt(color.substring(3, 5), 16)
+  const b = parseInt(color.substring(5, 7), 16)
+
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000
+  return yiq >= 128 ? '#1e293b' : '#ffffff'
+}
+
+function redirectToWorkspaceBoard(workspaceId: string, workspaceOwnerId: string, boardId: string) {
+  console.log('Redirecting to workspace board', workspaceId, boardId)
+  router.push(`/user/${workspaceOwnerId}/workspace/${workspaceId}/board/${boardId}`)
+}
+
+function redirectToWorkspaceBoards(workspaceId: string) {
+  console.log('Redirecting to workspace boards', workspaceId)
+  router.push(`/user/${workspaceUserId.value}/workspace/${workspaceId}/boards`)
+}
+
+function redirectToWorkspaceMembers(workspaceId: string) {
+  console.log('Redirecting to workspace members', workspaceId)
+  router.push(`/user/${workspaceUserId.value}/workspace/${workspaceId}/members`)
+}
+
+function redirectToWorkspaceSettings(workspaceId: string) {
+  console.log('Redirecting to workspace settings', workspaceId)
+  router.push(`/user/${workspaceUserId.value}/workspace/${workspaceId}/settings`)
+}
+
+function redirectToWorkspaces() {
+  console.log('Redirecting to workspaces')
+  router.push(`/user/${userId.value}`)
+}
+
+function redirectToCreateBoard() {
+  console.log('Redirecting to create board')
+  router.push(`/user/${workspaceUserId.value}/workspace/${workspaceId.value}/board/create`)
+}
+
+const addMemberToWorkspacePopup = ref(false)
+const inviteMemberToWorkspaceValue = ref('')
+const inputMemberError = ref<string | null>(null)
+const currentlyOpenedWorkspaceId = ref('')
+
+function showAddMemberToWorkspacePopup(workspaceId: string) {
+  console.log('Showing add member to workspace popup', workspaceId)
+  addMemberToWorkspacePopup.value = true
+  currentlyOpenedWorkspaceId.value = workspaceId
+}
+
+async function submitInviteMemberToWorkspace() {
+  if (inviteMemberToWorkspaceValue.value == userEmail) {
+    inputMemberError.value = 'You cannot add yourself as a member'
+    inviteMemberToWorkspaceValue.value = ''
+    return
+  }
+  try {
+    // Fetch the workspace details
+    const response = await axios.post(`/api/user/${workspaceUserId.value}/workspace/${currentlyOpenedWorkspaceId.value}/member/create/`, {
+      email: inviteMemberToWorkspaceValue.value
+    })
+    inviteMemberToWorkspaceValue.value = ''
+    if (response.data.status === 201) {
+      inputMemberError.value = null
+      addMemberToWorkspacePopup.value = false
+      await fetchWorkspaceMembers()
+    } else {
+      console.error('Failed to add member', response)
+      inputMemberError.value = response.data.error
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+async function fetchUser(userId: string) {
+  try {
+    const res = await axios.get(`/api/user/${userId}/`)
+
+    if (res.status === 200) {
+      return res.data.user
+    } else {
+      console.error('Failed to fetch user', res)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+async function fetchWorkspaceMembers() {
+  try {
+    const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/members/`)
+    workspace.value.members = []
+
+    if (res.data.status === 200) {
+      const members = res.data.members
+      console.log('Members', members)
+      for (const member of members) {
+        const user = await fetchUser(member.user_id)
+        workspace.value.members.push({
+          id: member.user_id,
+          name: user.name,
+          email: user.email,
+          role: member.role
+        })
+      }
+
+    } else {
+      console.error('Failed to fetch workspace members', res)
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 function onEventClick(event: any) {
@@ -651,9 +964,9 @@ const handleNameUpdate = async (listId: number, newName: string) => {
 }
 
 // Get workspaceId, boardId, and userId from route params
-const workspaceId = route.params.workspaceId as string
+const workspaceId = ref<string>(route.params.workspaceId as string)
 const boardId = route.params.boardId as string
-const userId = route.params.userId as string
+const userId = ref<string>(route.params.userId as string)
 
 const lists = ref<Array<{ name: string, id: number, column: number }>>([])
 // Computed value of lists according to col
@@ -890,18 +1203,95 @@ const fetchRealUser = async () => {
   }
 }
 
+async function fetchWorkspaceBoards() {
+  try {
+    // Fetch the workspace details
+    const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/boards/`)
+    workspace.value.boards = []
+
+    if (res.data.status === 200) {
+      if (isOwner.value) {
+        for (const board of res.data.boards) {
+            const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/board/${board.id}/members`)
+
+            board.member_count = res.data.members.length + 1
+            workspace.value.boards.push(board)
+        }
+        return
+      }
+      for (const board of res.data.boards) {
+        const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/board/${board.id}/members`)
+        board.member_count = res.data.members.length + 1
+
+        for (const member of res.data.members) {
+          if (member.user_id === userId.value && member.board_id === board.id) {
+            workspace.value.boards.push(board)
+            break
+          }
+        }
+      }
+    } else {
+      console.error('Failed to fetch workspace boards', res)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+async function fetchOwner() {
+  try {
+    const res = await axios.get(`/api/user/${workspaceUserId.value}/`)
+
+    console.log(res)
+    if (res.data.status === 200) {
+      console.log('Owner', res.data.user)
+      workspace.value.owner = res.data.user
+      console.log('Owner', workspace.value.owner)
+      if (workspace.value.owner.email === userEmail) {
+        console.log('Owner')
+        isOwner.value = true
+      }
+    } else {
+      console.error('Failed to fetch owner', res)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+async function fetchWorkspace() {
+  try {
+    // Fetch the workspace details
+    const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/`)
+
+    if (res.status === 200) {
+      workspace.value = res.data.workspace
+    } else {
+      console.error('Failed to fetch workspace', res)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+function fetchBoard() {
+  console.log('workspace', workspace.value)
+  const board = workspace.value.boards.find((b: { id: string }) => b.id == boardId)
+  boardName.value = board.name
+  boardColor.value = board.color
+  Cookies.set('boardColor', board.color)
+}
+
 onMounted(async() => {
   await fetchRealUser()
-  let res = await axios.get(`/api/user/${userId}/workspace/${workspaceId}`);
-  console.log('Workspace fetched:', res.data)
-  if (realUser.value === res.data.workspace.owner_id) {
-    isOwner.value = true
-  }
-  res = await axios.get(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}`);
-  console.log('Board fetched:', res.data)
-  boardName.value = res.data.board.name
-  boardColor.value = res.data.board.color
-  res = await axios.get(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}/labels`);
+  await fetchWorkspace()
+  await fetchOwner()
+  await fetchWorkspaceBoards()
+  await fetchWorkspaceMembers()
+  console.log('Workspace fetched:', workspace.value)
+  workspace.value.member_count = workspace.value.members.length + 1
+  fetchBoard()
+  let res = await axios.get(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}/labels`);
   console.log('Labels fetched:', res.data)
   boardLabels.value = res.data.labels
   res = await axios.get(`/api/user/${userId}/workspace/${workspaceId}/board/${boardId}/members`);
@@ -945,7 +1335,7 @@ onMounted(async() => {
 
 <style scoped>
 .height-adjusted {
-  height: calc(100vh - 14rem);
+  height: calc(100vh - 7rem);
 }
 </style>
 
@@ -964,5 +1354,8 @@ onMounted(async() => {
 .vuecal__flex .weekday-label {
   color: #444;
   font-weight: bold;
+}
+.before-bg-color::before {
+  background-color: var(--board-before-color);
 }
 </style>

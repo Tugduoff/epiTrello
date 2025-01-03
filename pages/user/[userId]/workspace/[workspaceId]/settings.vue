@@ -3,8 +3,7 @@
     class="absolute top-0 z-[100000000] w-screen h-screen bg-black/50 flex justify-center items-center"
     @click="addMemberToWorkspacePopup = false; inviteMemberToWorkspaceValue = ''; inputMemberError = null"
     @keydown.enter.prevent="submitInviteMemberToWorkspace">
-    <div class="relative w-[30rem] bg-white shadow-lg rounded-lg p-6"
-      @click.stop>
+    <div class="relative w-[30rem] bg-white shadow-lg rounded-lg p-6" @click.stop>
       <!-- Close Button -->
       <button @click="addMemberToWorkspacePopup = false; inviteMemberToWorkspaceValue = ''; inputMemberError = null" 
         class="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
@@ -48,7 +47,7 @@
             <div class="flex gap-2 items-center">
               <div class="w-10 h-10 rounded-md flex items-center justify-center" 
                 :style="{ backgroundColor: '#000077' }">
-                <span class="font-extrabold text-white" v-if="workspace.name">
+                <span class="font-extrabold text-white" v-if="workspace && workspace.name">
                   {{ workspace.name.charAt(0).toUpperCase() }}
                 </span>
               </div>
@@ -57,7 +56,7 @@
                   <h2 class="text-md font-semibold text-slate-700" v-if="workspace && workspace.name">{{ workspace.name }}</h2>
                   <Icon icon="mdi:crown" class="w-4 h-4 text-yellow-500" v-if="workspace.owner_id == userId" />
                 </div>
-                <p class="text-xs text-gray-500" v-if="workspace.members">{{ workspace.members.length + 1 }} Member{{ workspace.members.length + 1 > 1 ? 's' : '' }}</p>
+                <p class="text-xs text-gray-500" v-if="workspace && workspace.members">{{ workspace.members.length + 1 }} Member{{ workspace.members.length + 1 > 1 ? 's' : '' }}</p>
               </div>
             </div>
             <Icon icon="mdi:chevron-left" class="w-8 h-8 p-1 text-slate-500 hover:bg-gray-200 rounded-md hover:cursor-pointer"
@@ -67,19 +66,19 @@
 
           <!-- Navigation Buttons -->
           <div class="py-2 w-full">
-            <button class="flex gap-4 py-1 hover:bg-gray-200 items-center w-full !bg-gray-300">
+            <button class="flex gap-4 py-1 hover:bg-gray-200 items-center w-full"
+              @click="redirectToWorkspaceBoards(workspace.id)">
               <Icon icon="mdi:view-dashboard" class="text-slate-600 min-h-6 max-h-6 min-w-6 max-w-6 ml-3" />
               <span class="text-sm font-medium text-slate-800">Boards</span>
             </button>
             <button class="flex gap-4 py-1 hover:bg-gray-200 relative overflow-hidden group items-center w-full"
-              @click.stop="redirectToWorkspaceMembers(workspace.id)">
+              @click="redirectToWorkspaceMembers(workspace.id)">
               <Icon icon="mdi:account-multiple" class="text-slate-600 min-h-6 max-h-6 min-w-6 max-w-6 ml-3" />
               <span class="text-sm font-medium text-slate-800">Members</span>
-              <Icon icon="mdi:plus" class="text-slate-600 w-5 h-5 absolute right-2 hover:bg-gray-400 rounded-sm" v-if="isOwner"
-                  @click.stop="showAddMemberToWorkspacePopup(workspace.id)" />
+              <Icon icon="mdi:plus" class="text-slate-600 w-5 h-5 absolute right-2 hover:bg-gray-400 rounded-sm"
+                  @click.stop="showAddMemberToWorkspacePopup(workspace.id)" v-if="isOwner" />
             </button>
-            <button class="flex gap-4 py-1 hover:bg-gray-200 relative overflow-hidden group items-center w-full"
-              @click.stop="redirectToWorkspaceSettings(workspace.id)">
+            <button class="flex gap-4 py-1 hover:bg-gray-200 relative overflow-hidden group items-center w-full !bg-gray-300">
               <Icon icon="mdi:cog" class="text-slate-600 min-h-6 max-h-6 min-w-6 max-w-6 ml-3" />
               <span class="text-sm font-medium text-slate-800">Settings</span>
             </button>
@@ -89,17 +88,19 @@
           <div class="mt-1">
             <div class="flex justify-between items-center mb-3 relative">
               <p class="text-sm font-semibold text-gray-700 ml-3">Your Boards</p>
-              <Icon icon="mdi:plus" class="text-slate-600 w-5 h-5 absolute right-2 hover:bg-gray-200 rounded-sm hover:cursor-pointer" v-if="isOwner"
-                @click.stop="redirectToCreateBoard" />
+              <Icon icon="mdi:plus" class="text-slate-600 w-5 h-5 absolute right-2 hover:bg-gray-200 rounded-sm hover:cursor-pointer"
+                @click.stop="redirectToCreateBoard" v-if="isOwner" />
             </div>
-            <button v-for="(board, i) in workspace.boards" :key="board.id"
-              class="flex gap-4 py-1 hover:bg-gray-200 items-center w-full"
-              @click="redirectToWorkspaceBoard(workspace.id, workspace.owner_id, board.id)">
-              <div class="w-9 h-7 rounded-sm flex items-center justify-center ml-3" 
-                :style="{ backgroundColor: board.color }">
-              </div>
-              <span class="text-sm font-medium text-slate-800">{{ board.name }}</span>
-            </button>
+            <div v-if="workspace && workspace.boards">
+              <button v-for="(board, i) in workspace.boards" :key="board.id"
+                class="flex gap-4 py-1 hover:bg-gray-200 items-center w-full"
+                @click="redirectToWorkspaceBoard(workspace.id, workspace.owner_id, board.id)">
+                <div class="w-9 h-7 rounded-sm flex items-center justify-center ml-3" 
+                  :style="{ backgroundColor: board.color }">
+                </div>
+                <span class="text-sm font-medium text-slate-800">{{ board.name }}</span>
+              </button>
+            </div>
           </div>
           <button class="absolute bottom-0 w-full bg-slate-100 flex items-center justify-center gap-4 py-2 hover:bg-gray-200"
             @click="redirectToWorkspaces">
@@ -143,40 +144,41 @@
           <hr />
 
           <!-- Workspace Header -->
-          <div class="flex gap-2 mb-6 mt-4 items-center" v-if="workspace && workspace.boards && workspace.boards.length > 0">
-            <Icon icon="mdi:person" class="text-slate-600 w-6 h-6" />
-            <h1 class="text-lg font-black text-slate-800">Your boards</h1>
-          </div>
-
-          <!-- Workspace Header -->
-          <div v-else class="mt-12 text-center text-gray-600 text-lg flex justify-center flex-col items-center gap-6">
-            <img src="@/assets/img/inspired.png" class="w-1/3 rounded-sm" />
-            <p class="text-xs font-medium text-slate-600 w-1/3">Boards are where work gets done in Trello. On a board, you can move cards between lists to keep projects, tasks, and more on track.</p>
-            <button class="text-white bg-blue-500 px-4 py-2 rounded-sm text-sm" @click="redirectToCreateBoard" v-if="isOwner">Create your first board</button>
-          </div>
-
-          <div class="mt-4 flex flex-wrap -mx-2 justify-between items-center relative">
-            <div class="w-[23.5%] h-[7rem] rounded-sm py-1 px-2 relative bg-slate-300 flex justify-center items-center hover:cursor-pointer mb-4" v-if="isOwner"
-                @click="redirectToCreateBoard">
-                <h2 class="text-sm font-semibold text-slate-700">Create a new board</h2>
+          
+          <div class="flex w-full gap-2 justify-center mt-4 flex-col">
+            <h1 class="text-lg font-black text-slate-800">Workspace settings</h1>
+            <h2 class="text-sm font-semibold text-slate-700 flex rounded-md w-full mb-1">Workspace visibility</h2>
+            <hr />
+            <div class="flex gap-2 items-center mt-2 mb-8">
+              <Icon icon="ic:outline-lock" class="text-red-600/70 w-6 h-6" />
+              <span class="text-sm font-medium text-slate-700">Private - This Workspace is private. It's not indexed or visible to those outside the Workspace.</span>
             </div>
-            <div class="w-[23.5%] h-[7rem] rounded-sm py-1 px-2 relative hover:cursor-pointer mb-4" v-for="(board, i) in workspace.boards"
-              :style="{ backgroundColor: board.color }"
-              @click="redirectToWorkspaceBoard(workspace.id, workspace.owner_id, board.id)">
-              <h2 class="text-sm font-semibold"
-                :style="{ color: computeFromContrast(board.color) }">{{ board.name }}</h2>
-              <Icon icon="mdi:crown" class="w-4 h-4 absolute bottom-2 right-2" v-if="workspace.owner_id == userId"
-                :style="{ color: computeFromContrast(board.color) }" />
-              <div class="absolute bottom-2 left-2 group flex items-center hover:cursor-pointer" v-if="board.member_count > 1">
-                <Icon icon="mdi:account-multiple" class="w-8 h-4 pr-2"
-                  :style="{ color: computeFromContrast(board.color) }" />
-                <span class="text-xs group-hover:flex hidden -ml-2"
-                  :style="{ color: computeFromContrast(board.color) }">{{ board.member_count }}</span>
-              </div>
+            <div class="text-slate-700 bg-purple-900/20 py-4 px-6 rounded-sm relative">
+              <h3 class="text-md font-semibold text-slate-800">Workspace permissions</h3>
+              <Icon icon="clarity:license-line" class="text-gray-600 w-16 h-16 absolute right-4 top-2" />
+              <p class="text-sm font-medium text-slate-700 mt-2">You can invite members to this workspace and assign them roles. The roles are as follows:</p>
+              <ul class="list-disc list-inside text-sm font-medium text-slate-700 mt-2">
+                <li><strong>Owner</strong> - Can manage all settings, members, and boards.</li>
+                <li><strong>Member</strong> - Can view and edit boards.</li>
+              </ul>
+              <hr class="border-gray-400 my-4" />
+              <!-- Help section -->
+              <Icon icon="mdi:help-circle" class="text-purple-900/40 w-8 h-8 absolute left-[-1.2rem] -rotate-12 bg-white rounded-full" />
+              <p class="text-sm font-medium text-slate-700"><i>You can invite members to this workspace by clicking the button above.</i></p>
+              <p class="text-sm font-medium text-slate-700 mt-2"><i>You can also remove members from this workspace by clicking the remove button next to their name. (Only if you have Owner permissions)</i></p>
+              <p class="text-sm font-medium text-slate-700 mt-2"><i>You can view all boards in this workspace by clicking the boards button on the sidebar.</i></p>
+              <p class="text-sm font-medium text-slate-700 mt-2"><i>You can view all members in this workspace by clicking the members button on the sidebar.</i></p>
+              <hr class="border-gray-400 my-4" />
+              <h3 class="text-md font-semibold text-slate-800">Future</h3>
+              <p class="text-sm font-medium text-slate-700 mt-2">In the future, we plan to add more features to this workspace. Stay tuned!</p>
             </div>
-            <div class="w-[23.5%] h-[7rem]" v-if="workspace && workspace.boards && workspace.boards.length % 4 < 1 && !isOwner" />
-            <div class="w-[23.5%] h-[7rem]" v-if="workspace && workspace.boards && workspace.boards.length % 4 < 2" />
-            <div class="w-[23.5%] h-[7rem] bg-slate-100" v-if="workspace && workspace.boards && workspace.boards.length % 4 < 3" />
+            <!-- Delete workspace button -->
+            <button class="flex gap-4 py-1 bg-red-500/70 hover:bg-red-600/70 items-center rounded-sm px-4 mt-4 w-fit"
+              v-if="isOwner"
+              @click="deleteWorkspace()">
+              <Icon icon="mdi:delete" class="text-white w-6 h-6" />
+              <span class="text-sm font-bold text-white">Delete this workspace ?</span>
+            </button>
           </div>
         </div>
       </div>
@@ -211,27 +213,58 @@ const addMemberToWorkspacePopup = ref<boolean>(false)
 const currentlyOpenedWorkspaceId = ref<string>('')
 const inputMemberError = ref<string | null>(null)
 
-// Either returns text-white or text-slate-700 based on the contrast of the color
-function computeFromContrast(color: string) {
-  // Ensure the color starts with '#' and is in the correct format
-  if (!/^#([0-9A-Fa-f]{6})$/.test(color)) {
-    throw new Error('Invalid color format. Use #RRGGBB format.')
+const sortValue = ref<string>('')
+
+const membersSorted = computed(() => {
+  const members = Array.isArray(workspace.value.members) ? workspace.value.members : []
+
+  if (!workspace.value.owner) {
+    return members.filter((member: {
+      name: string
+      email: string
+      role: string
+    }) => member.name.toLowerCase().includes(sortValue.value.toLowerCase()))
   }
 
-  console.log('Computing contrast for color', color)
+  // Combine owner and members
+  const membersWithOwner = [
+    {
+      name: workspace.value.owner?.name,
+      email: workspace.value.owner?.email,
+      role: 'Owner',
+    },
+    ...members,
+  ]
 
-  // Extract RGB values
-  const r = parseInt(color.substring(1, 3), 16)
-  const g = parseInt(color.substring(3, 5), 16)
-  const b = parseInt(color.substring(5, 7), 16)
+  // Sort by role and then by name alphabetically
+  return membersWithOwner.filter((member: {
+    name: string
+    email: string
+    role: string
+  }) => 
+    member.name.toLowerCase().includes(sortValue.value.toLowerCase())
+  )
+})
 
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000
-  return yiq >= 128 ? '#1e293b' : '#ffffff'
-}
+async function removeUserFromWorkspace(email: string) {
+  console.log('Removing user from workspace', email, userEmail)
+  const memberId = workspace.value.members.find((member: any) => member.email === email).id
+  try {
+    const res = await axios.delete(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/member/${memberId}/`)
 
-function redirectToWorkspaceBoard(workspaceId: string, workspaceOwnerId: string, boardId: string) {
-  console.log('Redirecting to workspace board', workspaceId, boardId)
-  router.push(`/user/${workspaceOwnerId}/workspace/${workspaceId}/board/${boardId}`)
+    if (res.data.status === 204) {
+      workspace.value.members = workspace.value.members.filter((member: any) => member.id !== memberId)
+    } else {
+      console.error('Failed to remove member', res)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+  if (email == userEmail) {
+    console.log('Leaving workspace', email)
+    router.push(`/user/${userId.value}`)
+    return
+  }
 }
 
 function redirectToWorkspaceMembers(workspaceId: string) {
@@ -239,22 +272,9 @@ function redirectToWorkspaceMembers(workspaceId: string) {
   router.push(`/user/${workspaceUserId.value}/workspace/${workspaceId}/members`)
 }
 
-function redirectToWorkspaceSettings(workspaceId: string) {
-  console.log('Redirecting to workspace settings', workspaceId)
-  router.push(`/user/${workspaceUserId.value}/workspace/${workspaceId}/settings`)
-}
-
-function redirectToBoard(boardId: string) {
-  console.log('Redirecting to board', boardId)
-  router.push(`/user/${workspaceUserId.value}/workspace/${workspaceId.value}/board/${boardId}`)
-}
-
-function deleteBoard(boardId: string) {
-  console.log('Deleting board', boardId)
-}
-
-function editBoard(boardId: string) {
-  console.log('Editing board', boardId)
+function redirectToWorkspaceBoard(workspaceId: string, workspaceOwnerId: string, boardId: string) {
+  console.log('Redirecting to workspace board', workspaceId, boardId)
+  router.push(`/user/${workspaceOwnerId}/workspace/${workspaceId}/board/${boardId}`)
 }
 
 function redirectToWorkspaces() {
@@ -271,6 +291,21 @@ function showAddMemberToWorkspacePopup(workspaceId: string) {
   console.log('Showing add member to workspace popup', workspaceId)
   addMemberToWorkspacePopup.value = true
   currentlyOpenedWorkspaceId.value = workspaceId
+}
+
+async function deleteWorkspace() {
+  try {
+    const res = await axios.delete(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/`)
+
+    if (res.data.status === 200) {
+      console.log('Deleted workspace', res)
+      router.push(`/user/${userId.value}`)
+    } else {
+      console.error('Failed to delete workspace', res)
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 async function submitInviteMemberToWorkspace() {
@@ -300,7 +335,7 @@ async function submitInviteMemberToWorkspace() {
 
 function redirectToWorkspaceBoards(workspaceId: string) {
   console.log('Redirecting to workspace boards', workspaceId)
-  router.push(`/user/${userId.value}/workspace/${workspaceId}/boards`)
+  router.push(`/user/${workspaceUserId.value}/workspace/${workspaceId}/boards`)
 }
 
 // Fetch a user
@@ -322,11 +357,11 @@ async function fetchUser(userId: string) {
 async function fetchWorkspaceMembers() {
   try {
     const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/members/`)
-    workspace.value.members = []
 
     if (res.data.status === 200) {
       const members = res.data.members
       console.log('Members', members)
+      workspace.value.members = []
       for (const member of members) {
         const user = await fetchUser(member.user_id)
         workspace.value.members.push({
@@ -349,22 +384,15 @@ async function fetchWorkspaceBoards() {
   try {
     // Fetch the workspace details
     const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/boards/`)
-    workspace.value.boards = []
 
     if (res.data.status === 200) {
-      if (isOwner.value) {
-        for (const board of res.data.boards) {
-            const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/board/${board.id}/members`)
-
-            board.member_count = res.data.members.length + 1
-            workspace.value.boards.push(board)
-        }
-        return
-      }
+      workspace.value.boards = []
       for (const board of res.data.boards) {
+        if (isOwner.value) {
+          workspace.value.boards.push(board)
+          continue
+        }
         const res = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/board/${board.id}/members`)
-        board.member_count = res.data.members.length + 1
-
         for (const member of res.data.members) {
           if (member.user_id === userId.value && member.board_id === board.id) {
             workspace.value.boards.push(board)
@@ -388,6 +416,7 @@ async function fetchWorkspace() {
 
     if (res.status === 200) {
       workspace.value = res.data.workspace
+      console.log('Workspace', workspace.value)
     } else {
       console.error('Failed to fetch workspace', res)
     }
@@ -435,9 +464,8 @@ async function fetchOwner() {
 onMounted(async() => {
   await fetchRealUser()
   await fetchWorkspace()
-  await fetchOwner()
   await fetchWorkspaceMembers()
-  workspace.value.member_count = workspace.value.members.length + 1
+  await fetchOwner()
   await fetchWorkspaceBoards()
 })
 </script>

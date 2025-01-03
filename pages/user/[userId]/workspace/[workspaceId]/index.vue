@@ -89,7 +89,7 @@
           </NuxtLink>
 
           <NuxtLink 
-            :to="`/user/${userId}/workspaces/`" 
+            :to="`/user/${userId}`" 
             class="block text-center w-full md:w-auto px-4 py-2 rounded bg-slate-600 text-white font-semibold hover:bg-slate-700 transition"
           >
             Back to workspaces
@@ -179,7 +179,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -286,7 +286,7 @@ const fetchWorkspaceBoards = async () => {
     // Fetch the workspace details
     const response = await axios.get(`/api/user/${workspaceUserId.value}/workspace/${workspaceId.value}/boards/`)
 
-    if (response.status === 200) {
+    if (response.data.status === 200) {
       workspace.value.boards = []
       for (const board of response.data.boards) {
         if (isOwner.value) {
