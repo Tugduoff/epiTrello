@@ -92,7 +92,7 @@
               <button class="flex gap-4 hover:bg-gray-200 p-2 rounded-lg relative overflow-hidden group items-center"
                 @click="redirectToWorkspaceSettings(workspace.id, workspace.owner_id)">
                 <Icon icon="mdi:cog" class="text-slate-600 min-h-6 max-h-6 min-w-6 max-w-6 ml-1" />
-                <span class="text-sm font-semibold text-slate-800">Settingss</span>
+                <span class="text-sm font-semibold text-slate-800">Settings</span>
                 <Icon icon="mdi:chevron-right" class="text-slate-600 w-6 h-6 absolute right-[-2rem] transform transition-transform duration-300 ease-in-out group-hover:translate-x-[-2.5rem]" />
               </button>
             </div>
